@@ -1,0 +1,144 @@
+:root {
+  /* Palette based on the Life Saver Care Circle logo:
+     periwinkle hands circle + orange-red heart */
+  --text: #545a6e;
+  --text-h: #23263c;
+  --bg: #fff;
+  --surface: #fff;
+  --border: #e6e6f0;
+  --code-bg: #f5f5fb;
+  --accent: #5a5ec4;
+  --accent-strong: #4b4fb0;
+  --accent-bg: rgba(108, 112, 214, 0.08);
+  --accent-border: rgba(108, 112, 214, 0.35);
+  --warm: #e8471f;
+  --warm-strong: #cf3c18;
+  --warm-gradient: linear-gradient(120deg, #ff8a2a 0%, #f4522e 60%, #e8384f 100%);
+
+  /* Design tokens */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --shadow-sm: 0 1px 2px rgba(35, 38, 60, 0.06), 0 2px 8px rgba(35, 38, 60, 0.06);
+  --shadow-md: 0 4px 12px rgba(35, 38, 60, 0.08), 0 12px 32px rgba(35, 38, 60, 0.1);
+  --transition: 200ms ease;
+
+  --sans: 'Noto Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: 'Figtree', system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  font: 16px/1.6 var(--sans);
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #a7aabf;
+    --text-h: #f0f0f8;
+    --bg: #14151f;
+    --surface: #1b1c29;
+    --border: #2c2e40;
+    --code-bg: #1f2130;
+    --accent: #9599ec;
+    --accent-strong: #aeb1f2;
+    --accent-bg: rgba(143, 147, 232, 0.12);
+    --accent-border: rgba(143, 147, 232, 0.4);
+    --warm: #ff7a4d;
+    --warm-strong: #ff9068;
+    --warm-gradient: linear-gradient(120deg, #ffab5e 0%, #ff7a4d 60%, #f0526b 100%);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.4);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--heading);
+  font-weight: 700;
+  color: var(--text-h);
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: clamp(36px, 5vw, 54px);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: clamp(26px, 3.2vw, 34px);
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+a,
+button,
+select,
+[role='button'] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Visible focus for keyboard users, invisible for mouse */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--accent-bg);
+  color: var(--text-h);
+}
+
+img {
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .hero-aurora {
+    display: none;
+  }
+}

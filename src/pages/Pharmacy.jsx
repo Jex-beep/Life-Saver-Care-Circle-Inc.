@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { api, peso } from '../api.js'
 import { useCart } from '../context/CartContext.jsx'
 import { PillIcon } from '../components/Icons.jsx'
+import PageHeader from '../components/PageHeader.jsx'
 
 export default function Pharmacy() {
   const [params] = useSearchParams()
@@ -187,39 +188,57 @@ export default function Pharmacy() {
 
   /* ---------- Catalog view ---------- */
   return (
-    <section className="section page">
-      <h2>Pharmacy</h2>
-      <p className="section-sub">
+    <>
+      <PageHeader eyebrow="Online pharmacy" title="Order Medicines">
         Order from a Life Saver <span className="badge badge-gamot">Gamot</span> partner pharmacy — PhilHealth
         members may avail of medicines at these branches.
-      </p>
-
+      </PageHeader>
+    <section className="section page section-tight">
       {error && <p className="error-box">{error}</p>}
 
-      <div className="filter-bar">
-        <select value={branchId || ''} onChange={(e) => setBranchId(Number(e.target.value) || null)}>
-          <option value="">Choose your pharmacy branch…</option>
-          {pharmacies.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name} — {p.city}
-            </option>
-          ))}
-        </select>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          {categories.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
-        <input type="search" placeholder="Search medicines…" value={search} onChange={(e) => setSearch(e.target.value)} />
+      <div className="filter-card">
+        <label className="filter-field grow">
+          <span>Pharmacy branch</span>
+          <select value={branchId || ''} onChange={(e) => setBranchId(Number(e.target.value) || null)}>
+            <option value="">Choose your pharmacy branch…</option>
+            {pharmacies.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name} — {p.city}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="filter-field">
+          <span>Category</span>
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            {categories.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
+        </label>
+        <label className="filter-field grow">
+          <span>Search</span>
+          <input type="search" placeholder="Medicine or generic name…" value={search} onChange={(e) => setSearch(e.target.value)} />
+        </label>
       </div>
 
       <div className="shop-layout">
         <div className="product-grid">
           {filtered.map((p) => (
             <div key={p.id} className="product-card">
+              <div className="product-top">
+                <span className="product-tile">
+                  <PillIcon size={20} />
+                </span>
+                {p.requires_rx && (
+                  <span className="rx-chip" title="Prescription required">
+                    Rx required
+                  </span>
+                )}
+              </div>
               <h3>{p.name}</h3>
-              {p.generic_name && <p className="muted">{p.generic_name}</p>}
-              <p className="product-cat">{p.category}{p.requires_rx ? ' · ℞ prescription required' : ''}</p>
+              {p.generic_name && <p className="muted small">{p.generic_name}</p>}
+              <p className="product-cat">{p.category}</p>
               <div className="product-foot">
                 <span className="product-price">{peso(p.price)}</span>
                 <button type="button" className="btn btn-primary btn-sm" onClick={() => cart.add(p)}>
@@ -264,5 +283,6 @@ export default function Pharmacy() {
         </aside>
       </div>
     </section>
+    </>
   )
 }

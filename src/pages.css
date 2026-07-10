@@ -5,59 +5,31 @@
   background: url('/ls-hero-image.png') center / cover no-repeat;
 }
 
-/* dark overlay so text stays readable over the photo, heavier on the left */
+/* white overlay keeps the clinic photo as a soft backdrop and text readable */
 .hero-wrap::before {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
     100deg,
-    rgba(12, 10, 26, 0.92) 0%,
-    rgba(12, 10, 26, 0.78) 45%,
-    rgba(12, 10, 26, 0.5) 100%
+    rgba(255, 255, 255, 0.93) 0%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 0.3) 100%
   );
 }
 
 .hero-aurora {
   position: absolute;
   inset: 0;
-  opacity: 0.4;
+  opacity: 0.18;
 }
 
 .hero-wrap .hero {
   position: relative;
 }
 
-/* the photo backdrop is always dark — force light text in both themes */
-.hero-wrap .hero-line {
-  color: #fff;
-}
-
-.hero-wrap .hero-eyebrow {
-  color: #ffb27a;
-}
-
-.hero-wrap .hero-text,
-.hero-wrap .hero-badges {
-  color: rgba(255, 255, 255, 0.88);
-}
-
-.hero-wrap .badge-yakap {
-  background: rgba(143, 147, 232, 0.2);
-  color: #c3c5f5;
-  border-color: rgba(143, 147, 232, 0.6);
-}
-
-.hero-wrap .badge-gamot {
-  background: rgba(255, 154, 61, 0.16);
-  color: #ffb27a;
-  border-color: rgba(255, 154, 61, 0.5);
-}
-
 .hero-wrap .btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.45);
-  color: #fff;
+  background: #fff;
 }
 
 .hero-heading {
@@ -232,6 +204,36 @@
   min-height: 60vh;
 }
 
+/* ---------- Page header band (inner pages) ---------- */
+
+.page-header {
+  background:
+    radial-gradient(600px 200px at 15% 0%, rgba(108, 112, 214, 0.1), transparent 70%),
+    radial-gradient(600px 200px at 85% 0%, rgba(244, 82, 46, 0.07), transparent 70%),
+    var(--code-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 56px 24px 48px;
+  text-align: center;
+}
+
+.page-header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.page-header h2 {
+  margin: 0 0 12px;
+}
+
+.page-header-sub {
+  max-width: 58ch;
+  margin: 0 auto;
+}
+
+.section-tight {
+  padding-top: 48px;
+}
+
 code {
   font-family: ui-monospace, Consolas, monospace;
   font-size: 0.9em;
@@ -318,6 +320,72 @@ code {
 .nav-links a.active {
   color: var(--accent);
   font-weight: 600;
+}
+
+/* ---------- Filter card ---------- */
+
+.filter-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  max-width: 860px;
+  margin: 0 auto 20px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.filter-field.grow {
+  flex: 1;
+}
+
+.filter-field > span {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+.filter-field select,
+.filter-field input {
+  font: inherit;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+  transition: border-color var(--transition);
+  width: 100%;
+}
+
+.filter-field select:focus,
+.filter-field input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.result-count {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.result-count strong {
+  color: var(--text-h);
 }
 
 /* ---------- Filter bar / forms ---------- */
@@ -446,30 +514,76 @@ code {
 
 .steps {
   display: flex;
-  gap: 8px;
   justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 32px;
+  max-width: 640px;
+  margin: 0 auto 48px;
 }
 
 .step {
-  padding: 6px 16px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  font-size: 14px;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+.step::before {
+  content: attr(data-num);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  color: var(--text);
+  font-family: var(--heading);
+  font-weight: 700;
+  transition: background-color var(--transition), border-color var(--transition), color var(--transition);
+}
+
+/* connector line between circles */
+.step:not(:first-child)::after {
+  content: '';
+  position: absolute;
+  top: 18px;
+  right: calc(50% + 26px);
+  width: calc(100% - 52px);
+  height: 2px;
+  border-radius: 2px;
+  background: var(--border);
 }
 
 .step.current {
-  background: var(--accent);
+  color: var(--accent);
+}
+
+.step.current::before {
   border-color: var(--accent);
-  color: #fff;
-  font-weight: 600;
+  background: var(--accent-bg);
+  color: var(--accent);
 }
 
 .step.done {
-  background: var(--accent-bg);
-  border-color: var(--accent-border);
   color: var(--accent);
+}
+
+.step.done::before {
+  content: '✓';
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.step.done:not(:first-child)::after,
+.step.current:not(:first-child)::after {
+  background: var(--accent);
 }
 
 .picked {
@@ -556,10 +670,30 @@ code {
   line-height: 170%;
 }
 
-.status-line {
+.status-pill {
+  display: inline-block;
   font-weight: 700;
-  color: var(--text-h);
+  font-size: 14px;
+  padding: 6px 18px;
+  border-radius: 999px;
   margin: 8px 0 12px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.status-pill.status-completed,
+.status-pill.status-ready {
+  background: rgba(22, 163, 74, 0.1);
+  color: #15803d;
+  border-color: rgba(22, 163, 74, 0.35);
+}
+
+.status-pill.status-cancelled,
+.status-pill.status-no_show {
+  background: rgba(198, 40, 64, 0.08);
+  color: #c62840;
+  border-color: rgba(198, 40, 64, 0.3);
 }
 
 .track-form {
@@ -612,6 +746,36 @@ code {
   border-color: var(--accent-border);
 }
 
+.product-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.product-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.rx-chip {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(232, 71, 31, 0.08);
+  color: var(--warm-strong);
+  border: 1px solid rgba(232, 71, 31, 0.3);
+}
+
 .product-card h3 {
   font-size: 16px;
   margin: 0 0 2px;
@@ -620,8 +784,8 @@ code {
 
 .product-cat {
   font-size: 13px;
-  margin: 6px 0 12px;
-  color: var(--warm);
+  margin: 8px 0 14px;
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -766,6 +930,18 @@ code {
 
   .about-photos img {
     height: 150px;
+  }
+
+  .step {
+    font-size: 11px;
+  }
+
+  .filter-card {
+    align-items: stretch;
+  }
+
+  .filter-field {
+    min-width: 100%;
   }
 
   .shop-layout {

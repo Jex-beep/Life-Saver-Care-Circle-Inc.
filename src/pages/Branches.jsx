@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api.js'
 import { MapPinIcon, PhoneIcon } from '../components/Icons.jsx'
+import PageHeader from '../components/PageHeader.jsx'
 
 export function branchBadges(targetClient) {
   const badges = []
@@ -41,33 +42,46 @@ export default function Branches() {
   )
 
   return (
-    <section className="section page">
-      <h2>Our Branches</h2>
-      <p className="section-sub">
-        Find your nearest Life Saver clinic or pharmacy. <span className="badge badge-yakap">Yakap</span> =
-        PhilHealth-accredited Primary Care · <span className="badge badge-gamot">Gamot</span> = PhilHealth
-        medicine partner
-      </p>
-
-      <div className="filter-bar">
-        <select value={area} onChange={(e) => { setArea(e.target.value); setProvince('All') }}>
-          {areas.map((a) => (
-            <option key={a}>{a}</option>
-          ))}
-        </select>
-        <select value={province} onChange={(e) => setProvince(e.target.value)}>
-          {provinces.map((p) => (
-            <option key={p}>{p}</option>
-          ))}
-        </select>
-        <input
-          type="search"
-          placeholder="Search branch or city…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+    <>
+      <PageHeader eyebrow="Our network" title="Find a Branch">
+        Find your nearest Life Saver clinic or pharmacy.{' '}
+        <span className="badge badge-yakap">Yakap</span> PhilHealth-accredited Primary Care ·{' '}
+        <span className="badge badge-gamot">Gamot</span> PhilHealth medicine partner
+      </PageHeader>
+    <section className="section page section-tight">
+      <div className="filter-card">
+        <label className="filter-field">
+          <span>Area</span>
+          <select value={area} onChange={(e) => { setArea(e.target.value); setProvince('All') }}>
+            {areas.map((a) => (
+              <option key={a}>{a}</option>
+            ))}
+          </select>
+        </label>
+        <label className="filter-field">
+          <span>Province</span>
+          <select value={province} onChange={(e) => setProvince(e.target.value)}>
+            {provinces.map((p) => (
+              <option key={p}>{p}</option>
+            ))}
+          </select>
+        </label>
+        <label className="filter-field grow">
+          <span>Search</span>
+          <input
+            type="search"
+            placeholder="Branch name or city…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </label>
       </div>
 
+      {!loading && !error && (
+        <p className="result-count">
+          Showing <strong>{filtered.length}</strong> of {branches.length} branches
+        </p>
+      )}
       {loading && <p className="muted center">Loading branches…</p>}
       {error && <p className="error-box">{error}</p>}
 
@@ -110,5 +124,6 @@ export default function Branches() {
         <p className="muted center">No branches match those filters.</p>
       )}
     </section>
+    </>
   )
 }

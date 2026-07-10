@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { api, peso } from '../api.js'
+import PageHeader from '../components/PageHeader.jsx'
 
 const STATUS_LABELS = {
   confirmed: 'Confirmed',
@@ -32,13 +33,12 @@ export default function Track() {
   }
 
   return (
-    <section className="section page page-narrow">
-      <h2>Track Your Booking or Order</h2>
-      <p className="section-sub">
+    <>
+      <PageHeader eyebrow="Reference lookup" title="Track Your Booking or Order">
         Enter the reference number you received — bookings start with <code>LS-BK</code>, pharmacy orders with{' '}
         <code>LS-OR</code>.
-      </p>
-
+      </PageHeader>
+    <section className="section page page-narrow section-tight">
       <form className="track-form" onSubmit={lookup}>
         <input
           required
@@ -56,7 +56,7 @@ export default function Track() {
       {result?.type === 'booking' && (
         <div className="confirm-card">
           <h3>Booking {result.reference}</h3>
-          <p className="status-line">{STATUS_LABELS[result.status] || result.status}</p>
+          <p className={`status-pill status-${result.status}`}>{STATUS_LABELS[result.status] || result.status}</p>
           <div className="confirm-details">
             <p><strong>{result.branches?.name}</strong> ({result.branches?.city})</p>
             <p>{result.services?.name}</p>
@@ -70,7 +70,7 @@ export default function Track() {
       {result?.type === 'order' && (
         <div className="confirm-card">
           <h3>Order {result.reference}</h3>
-          <p className="status-line">{STATUS_LABELS[result.status] || result.status}</p>
+          <p className={`status-pill status-${result.status}`}>{STATUS_LABELS[result.status] || result.status}</p>
           <div className="confirm-details">
             <p><strong>{result.branches?.name}</strong> ({result.branches?.city})</p>
             <ul className="order-items">
@@ -93,5 +93,6 @@ export default function Track() {
         </div>
       )}
     </section>
+    </>
   )
 }

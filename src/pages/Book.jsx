@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api.js'
 import { branchBadges } from './Branches.jsx'
 import { CheckCircleIcon } from '../components/Icons.jsx'
+import PageHeader from '../components/PageHeader.jsx'
 
 const todayStr = () => {
   const d = new Date()
@@ -97,14 +98,19 @@ export default function Book() {
   }
 
   return (
-    <section className="section page">
-      <h2>Book an Appointment</h2>
-      <p className="section-sub">Choose your preferred branch, service, and time — instant confirmation.</p>
-
+    <>
+      <PageHeader eyebrow="Appointments" title="Book an Appointment">
+        Choose your preferred branch, service, and time — instant confirmation with a reference number.
+      </PageHeader>
+    <section className="section page section-tight">
       <div className="steps">
         {['Branch', 'Service', 'Date & Time', 'Your Details'].map((label, i) => (
-          <span key={label} className={`step ${step === i + 1 ? 'current' : step > i + 1 ? 'done' : ''}`}>
-            {i + 1}. {label}
+          <span
+            key={label}
+            data-num={i + 1}
+            className={`step ${step === i + 1 ? 'current' : step > i + 1 ? 'done' : ''}`}
+          >
+            {label}
           </span>
         ))}
       </div>
@@ -229,5 +235,6 @@ export default function Book() {
         </>
       )}
     </section>
+    </>
   )
 }

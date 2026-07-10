@@ -28,33 +28,13 @@
   --heading: 'Figtree', system-ui, 'Segoe UI', Roboto, sans-serif;
 
   font: 16px/1.6 var(--sans);
-  color-scheme: light dark;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #a7aabf;
-    --text-h: #f0f0f8;
-    --bg: #14151f;
-    --surface: #1b1c29;
-    --border: #2c2e40;
-    --code-bg: #1f2130;
-    --accent: #9599ec;
-    --accent-strong: #aeb1f2;
-    --accent-bg: rgba(143, 147, 232, 0.12);
-    --accent-border: rgba(143, 147, 232, 0.4);
-    --warm: #ff7a4d;
-    --warm-strong: #ff9068;
-    --warm-gradient: linear-gradient(120deg, #ffab5e 0%, #ff7a4d 60%, #f0526b 100%);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.4);
-  }
 }
 
 * {

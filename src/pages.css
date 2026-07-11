@@ -953,3 +953,93 @@ code {
     order: -1;
   }
 }
+<<<<<<< HEAD
+=======
+
+
+/* ---------- Hero with photo + Aurora background ---------- */
+ 
+.hero-wrap {
+  position: relative;
+  overflow: hidden;
+  background: none;
+}
+ 
+.hero-bg-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+ 
+.hero-bg-front {
+  animation: heroBgSlideIn 0.9s ease forwards;
+}
+ 
+@keyframes heroBgSlideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+ 
+/* ---------- Hero with photo + Aurora background ---------- */
+ 
+.hero-wrap {
+  position: relative;
+  overflow: hidden;
+  /* fallback so the section is never fully blank even if images fail to load */
+  background: url('/ls-hero-image.png') center / cover no-repeat;
+}
+ 
+.hero-bg-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+ 
+.hero-bg-front {
+  animation: heroBgSlideIn 0.9s ease forwards;
+}
+ 
+@keyframes heroBgSlideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+ 
+/* white overlay keeps the clinic photo as a soft backdrop and text readable */
+.hero-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0.93) 0%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+}
+ 
+.hero-aurora {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  z-index: 2;
+}
+ 
+.hero-wrap .hero {
+  position: relative;
+  z-index: 3;
+}
+>>>>>>> 00991bc (Initial commit)

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useEffect } from 'react'
+=======
+import { useEffect, useState } from 'react'
+>>>>>>> 00991bc (Initial commit)
 import { Link, useLocation } from 'react-router-dom'
 import Aurora from '../components/bits/Aurora.jsx'
 import BlurText from '../components/bits/BlurText.jsx'
@@ -34,8 +38,29 @@ const FACILITIES = [
   { src: '/ls-stock-image.jpg', caption: 'Mobile clinics bringing care to your barangay' },
 ]
 
+<<<<<<< HEAD
 export default function Home() {
   const location = useLocation()
+=======
+// Images cycled in the hero photo card
+const HERO_IMAGES = [
+  '/ls-stock-image2.jpg',
+  '/dentist-office.jpg',
+  '/ls-injection.png',
+]
+
+// Images cycled behind the whole hero section (swap these for whichever background shots you want)
+const HERO_BG_IMAGES = [
+  '/ls-hero-image.png',
+  '/ls-givingmedicine.png',
+  '/ls-injection.png',
+]
+
+export default function Home() {
+  const location = useLocation()
+  const [bgIndex, setBgIndex] = useState(0)
+  const [prevBgIndex, setPrevBgIndex] = useState(0)
+>>>>>>> 00991bc (Initial commit)
 
   useEffect(() => {
     if (location.hash) {
@@ -45,9 +70,36 @@ export default function Home() {
     }
   }, [location])
 
+<<<<<<< HEAD
   return (
     <>
       <section id="home" className="hero-wrap">
+=======
+  useEffect(() => {
+    const id = setInterval(() => {
+      setBgIndex((i) => (i + 1) % HERO_BG_IMAGES.length)
+    }, 10000)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <>
+      <section id="home" className="hero-wrap">
+        <img
+          className="hero-bg-layer hero-bg-back"
+          src={HERO_BG_IMAGES[prevBgIndex]}
+          alt=""
+          aria-hidden="true"
+        />
+        <img
+          key={bgIndex}
+          className="hero-bg-layer hero-bg-front"
+          src={HERO_BG_IMAGES[bgIndex]}
+          alt=""
+          aria-hidden="true"
+          onAnimationEnd={() => setPrevBgIndex(bgIndex)}
+        />
+>>>>>>> 00991bc (Initial commit)
         <div className="hero-aurora">
           <Aurora colorStops={['#6c70d6', '#ff9a3d', '#e8384f']} amplitude={1.1} blend={0.55} speed={0.8} />
         </div>
@@ -82,7 +134,14 @@ export default function Home() {
           </div>
           <div className="hero-visual">
             <div className="hero-photo-card">
+<<<<<<< HEAD
               <img src="/ls-stock-image2.jpg" alt="Life Saver PhilHealth Yakap Primary Care Clinic" />
+=======
+              <img
+                src={HERO_IMAGES[0]}
+                alt="Life Saver PhilHealth Yakap Primary Care Clinic"
+              />
+>>>>>>> 00991bc (Initial commit)
               <div className="hero-photo-caption">
                 <p className="hero-card-title">
                   <CountUp to={13} duration={1.5} />+ Branches

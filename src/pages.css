@@ -1,8 +1,8 @@
-/* ---------- Hero with photo + Aurora background ---------- */
+﻿/* ---------- Hero with photo + Aurora background ---------- */
 
 .hero-wrap {
   position: relative;
-  background: url('/ls-hero-image.png') center / cover no-repeat;
+  background: url('/ls-hero-image.jpg') center / cover no-repeat;
 }
 
 /* white overlay keeps the clinic photo as a soft backdrop and text readable */
@@ -175,6 +175,383 @@
   position: relative;
 }
 
+/* ---------- About page (editorial layout) ---------- */
+
+.ab-cover {
+  position: relative;
+  height: min(72vh, 640px);
+  min-height: 420px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.ab-cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ab-cover-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(16, 14, 34, 0.78) 0%, rgba(16, 14, 34, 0.25) 45%, rgba(16, 14, 34, 0.15) 100%);
+}
+
+.ab-cover-text {
+  position: relative;
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px 96px;
+}
+
+.ab-kicker {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 16px;
+}
+
+.ab-kicker.dark {
+  color: var(--warm);
+}
+
+.ab-title {
+  margin: 0;
+}
+
+.ab-title-line {
+  font-family: var(--heading);
+  font-weight: 800;
+  font-size: clamp(40px, 6.5vw, 76px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: #fff;
+  margin: 0;
+}
+
+/* Overlapping stat bar */
+
+.ab-statbar {
+  position: relative;
+  z-index: 2;
+  max-width: 1064px;
+  margin: -56px auto 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.ab-statbar > div {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ab-statbar > div + div {
+  border-left: 1px solid var(--border);
+}
+
+.ab-statbar strong {
+  font-family: var(--heading);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-h);
+  font-variant-numeric: tabular-nums;
+}
+
+.ab-statbar span {
+  font-size: 13px;
+}
+
+/* Chapter heads */
+
+.ab-section {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 96px 24px 0;
+  text-align: left;
+}
+
+.ab-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 44px;
+}
+
+.ab-head-num {
+  font-family: var(--heading);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--warm);
+}
+
+.ab-head-rule {
+  width: 44px;
+  height: 1px;
+  background: var(--border);
+}
+
+.ab-head-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--text-h);
+}
+
+.ab-head.light .ab-head-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.ab-head.light .ab-head-rule {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 01 Story */
+
+.ab-story {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 72px;
+  align-items: start;
+}
+
+.ab-lead {
+  font-family: var(--heading);
+  font-size: clamp(20px, 2.2vw, 25px);
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--text-h);
+  margin-bottom: 24px;
+}
+
+.ab-story-text p:not(.ab-lead) {
+  margin-bottom: 20px;
+  max-width: 58ch;
+}
+
+.ab-arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 2px solid var(--accent-border);
+  padding-bottom: 4px;
+  transition: gap var(--transition), border-color var(--transition);
+}
+
+.ab-arrow-link:hover {
+  gap: 14px;
+  border-color: var(--accent);
+}
+
+.ab-collage {
+  position: relative;
+  padding-bottom: 56px;
+}
+
+.ab-collage-main {
+  width: 86%;
+  height: 340px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  display: block;
+}
+
+.ab-collage-offset {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 52%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  border: 6px solid var(--bg);
+  box-shadow: var(--shadow-md);
+}
+
+/* 02 Vision */
+
+.ab-vision {
+  margin-top: 104px;
+  background:
+    linear-gradient(rgba(19, 16, 42, 0.85), rgba(19, 16, 42, 0.85)),
+    url('/people.jpg') center / cover no-repeat;
+  padding: 112px 24px;
+}
+
+.ab-vision-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.ab-vision-text {
+  font-family: var(--heading);
+  font-size: clamp(24px, 3.4vw, 38px);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: #fff;
+}
+
+/* 03 Mission */
+
+.ab-mission-intro {
+  font-size: 17px;
+  color: var(--text-h);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.ab-missions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ab-mission {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.ab-mission:last-child {
+  border-bottom: none;
+}
+
+.ab-mission-num {
+  font-family: var(--heading);
+  font-weight: 800;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1;
+  color: color-mix(in srgb, var(--accent) 28%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.ab-mission p {
+  font-size: 16px;
+  line-height: 1.65;
+  max-width: 72ch;
+  color: var(--text-h);
+}
+
+/* 04 Values */
+
+.ab-values {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 56px;
+}
+
+.ab-value {
+  border-top: 1px solid var(--border);
+  padding: 26px 0 30px;
+}
+
+.ab-value-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--accent);
+}
+
+.ab-value-name h3 {
+  font-size: 18px;
+  margin: 0;
+  color: var(--text-h);
+}
+
+.ab-value p {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.65;
+  max-width: 48ch;
+}
+
+/* 05 Mosaic gallery */
+
+.ab-mosaic {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  grid-template-rows: repeat(2, 236px);
+  gap: 16px;
+}
+
+.ab-mosaic figure {
+  margin: 0;
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.ab-mosaic-big {
+  grid-row: 1 / -1;
+}
+
+.ab-mosaic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.ab-mosaic figure:hover img {
+  transform: scale(1.04);
+}
+
+.ab-mosaic figcaption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 40px 18px 14px;
+  background: linear-gradient(to top, rgba(16, 14, 34, 0.72), transparent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* Closing CTA */
+
+.ab-cta {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 104px 24px 112px;
+  text-align: left;
+}
+
+.ab-cta h2 {
+  font-size: clamp(30px, 4.5vw, 48px);
+  letter-spacing: -0.02em;
+  margin: 0 0 32px;
+  max-width: 20ch;
+}
+
+.ab-cta-actions {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
 /* ---------- Badges ---------- */
 
 .badge {
@@ -575,7 +952,7 @@ code {
 }
 
 .step.done::before {
-  content: '✓';
+  content: 'âœ“';
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
@@ -944,6 +1321,94 @@ code {
     min-width: 100%;
   }
 
+  .ab-cover {
+    height: 56vh;
+    min-height: 360px;
+  }
+
+  .ab-cover-text {
+    padding-bottom: 72px;
+  }
+
+  .ab-statbar {
+    grid-template-columns: 1fr 1fr;
+    margin: -40px 16px 0;
+  }
+
+  .ab-statbar > div {
+    padding: 18px 20px;
+  }
+
+  .ab-statbar > div:nth-child(3) {
+    border-left: none;
+  }
+
+  .ab-statbar > div:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+
+  .ab-section {
+    padding-top: 64px;
+  }
+
+  .ab-story {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .ab-collage {
+    padding-bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .ab-collage-main {
+    width: 100%;
+    height: 180px;
+  }
+
+  .ab-collage-offset {
+    position: static;
+    width: 100%;
+    height: 180px;
+    border: none;
+    box-shadow: none;
+  }
+
+  .ab-vision {
+    margin-top: 64px;
+    padding: 72px 24px;
+  }
+
+  .ab-mission {
+    grid-template-columns: 56px 1fr;
+    padding: 20px 0;
+  }
+
+  .ab-values {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+
+  .ab-mosaic {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+
+  .ab-mosaic figure {
+    height: 200px;
+  }
+
+  .ab-mosaic-big {
+    grid-row: auto;
+    height: 240px;
+  }
+
+  .ab-cta {
+    padding: 72px 24px 80px;
+  }
+
   .shop-layout {
     grid-template-columns: 1fr;
   }
@@ -953,48 +1418,15 @@ code {
     order: -1;
   }
 }
-<<<<<<< HEAD
-=======
+/* ---------- Hero slideshow background ---------- */
 
-
-/* ---------- Hero with photo + Aurora background ---------- */
- 
 .hero-wrap {
   position: relative;
   overflow: hidden;
-  background: none;
+  /* fallback so the section is never blank if images fail to load */
+  background: url('/ls-hero-image.jpg') center / cover no-repeat;
 }
- 
-.hero-bg-layer {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
-}
- 
-.hero-bg-front {
-  animation: heroBgSlideIn 0.9s ease forwards;
-}
- 
-@keyframes heroBgSlideIn {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
- 
-/* ---------- Hero with photo + Aurora background ---------- */
- 
-.hero-wrap {
-  position: relative;
-  overflow: hidden;
-  /* fallback so the section is never fully blank even if images fail to load */
-  background: url('/ls-hero-image.png') center / cover no-repeat;
-}
- 
+
 .hero-bg-layer {
   position: absolute;
   inset: 0;
@@ -1003,11 +1435,11 @@ code {
   object-fit: cover;
   z-index: 0;
 }
- 
+
 .hero-bg-front {
   animation: heroBgSlideIn 0.9s ease forwards;
 }
- 
+
 @keyframes heroBgSlideIn {
   from {
     transform: translateX(100%);
@@ -1016,7 +1448,7 @@ code {
     transform: translateX(0);
   }
 }
- 
+
 /* white overlay keeps the clinic photo as a soft backdrop and text readable */
 .hero-wrap::before {
   content: '';
@@ -1030,16 +1462,15 @@ code {
     rgba(255, 255, 255, 0.3) 100%
   );
 }
- 
+
 .hero-aurora {
   position: absolute;
   inset: 0;
   opacity: 0.18;
   z-index: 2;
 }
- 
+
 .hero-wrap .hero {
   position: relative;
   z-index: 3;
 }
->>>>>>> 00991bc (Initial commit)

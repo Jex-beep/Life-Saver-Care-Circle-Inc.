@@ -14,6 +14,7 @@ export default function Footer() {
         </div>
         <div>
           <h4>Quick Links</h4>
+          <p><Link to="/about">About Us</Link></p>
           <p><Link to="/branches">Find a Branch</Link></p>
           <p><Link to="/book">Book an Appointment</Link></p>
           <p><Link to="/pharmacy">Order Medicines</Link></p>

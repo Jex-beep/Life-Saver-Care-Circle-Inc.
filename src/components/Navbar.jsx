@@ -5,6 +5,7 @@ import { CartIcon } from './Icons.jsx'
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
+  { label: 'About', to: '/about' },
   { label: 'Branches', to: '/branches' },
   { label: 'Pharmacy', to: '/pharmacy' },
   { label: 'Track', to: '/track' },

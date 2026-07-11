@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useEffect } from 'react'
-=======
 import { useEffect, useState } from 'react'
->>>>>>> 00991bc (Initial commit)
 import { Link, useLocation } from 'react-router-dom'
 import Aurora from '../components/bits/Aurora.jsx'
 import BlurText from '../components/bits/BlurText.jsx'
@@ -38,29 +34,24 @@ const FACILITIES = [
   { src: '/ls-stock-image.jpg', caption: 'Mobile clinics bringing care to your barangay' },
 ]
 
-<<<<<<< HEAD
-export default function Home() {
-  const location = useLocation()
-=======
 // Images cycled in the hero photo card
 const HERO_IMAGES = [
   '/ls-stock-image2.jpg',
   '/dentist-office.jpg',
-  '/ls-injection.png',
+  '/ls-injection.jpg',
 ]
 
 // Images cycled behind the whole hero section (swap these for whichever background shots you want)
 const HERO_BG_IMAGES = [
-  '/ls-hero-image.png',
-  '/ls-givingmedicine.png',
-  '/ls-injection.png',
+  '/ls-hero-image.jpg',
+  '/ls-givingmedicine.jpg',
+  '/ls-injection.jpg',
 ]
 
 export default function Home() {
   const location = useLocation()
   const [bgIndex, setBgIndex] = useState(0)
   const [prevBgIndex, setPrevBgIndex] = useState(0)
->>>>>>> 00991bc (Initial commit)
 
   useEffect(() => {
     if (location.hash) {
@@ -70,11 +61,6 @@ export default function Home() {
     }
   }, [location])
 
-<<<<<<< HEAD
-  return (
-    <>
-      <section id="home" className="hero-wrap">
-=======
   useEffect(() => {
     const id = setInterval(() => {
       setBgIndex((i) => (i + 1) % HERO_BG_IMAGES.length)
@@ -99,7 +85,6 @@ export default function Home() {
           aria-hidden="true"
           onAnimationEnd={() => setPrevBgIndex(bgIndex)}
         />
->>>>>>> 00991bc (Initial commit)
         <div className="hero-aurora">
           <Aurora colorStops={['#6c70d6', '#ff9a3d', '#e8384f']} amplitude={1.1} blend={0.55} speed={0.8} />
         </div>
@@ -134,14 +119,10 @@ export default function Home() {
           </div>
           <div className="hero-visual">
             <div className="hero-photo-card">
-<<<<<<< HEAD
-              <img src="/ls-stock-image2.jpg" alt="Life Saver PhilHealth Yakap Primary Care Clinic" />
-=======
               <img
                 src={HERO_IMAGES[0]}
                 alt="Life Saver PhilHealth Yakap Primary Care Clinic"
               />
->>>>>>> 00991bc (Initial commit)
               <div className="hero-photo-caption">
                 <p className="hero-card-title">
                   <CountUp to={13} duration={1.5} />+ Branches
@@ -232,8 +213,8 @@ export default function Home() {
           <div className="about-photos">
             <img src="/ls-stalls.jpg" alt="Life Saver community health outreach booth" loading="lazy" />
             <img
-              src="/ls-care-photo-in-wall.jpg"
-              alt="Let's Care Worldwide Foundation plaque inside a Life Saver clinic"
+              src="/people-gathering.jpg"
+              alt="Community members gathered at a Life Saver health event"
               loading="lazy"
             />
           </div>

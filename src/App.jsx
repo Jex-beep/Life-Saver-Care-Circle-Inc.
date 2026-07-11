@@ -3,6 +3,7 @@ import { CartProvider } from './context/CartContext.jsx'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import Home from './pages/Home.jsx'
+import About from './pages/About.jsx'
 import Branches from './pages/Branches.jsx'
 import Book from './pages/Book.jsx'
 import Pharmacy from './pages/Pharmacy.jsx'
@@ -29,6 +30,7 @@ function App() {
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
           <Route path="/branches" element={<Branches />} />
           <Route path="/book" element={<Book />} />
           <Route path="/pharmacy" element={<Pharmacy />} />

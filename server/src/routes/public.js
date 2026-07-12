@@ -300,6 +300,23 @@ router.get('/track/:reference', async (req, res) => {
   res.status(400).json({ error: 'Reference numbers start with LS-BK (bookings) or LS-OR (orders)' })
 })
 
+/* ---------- Announcements (posted by superadmin) ---------- */
+
+router.get('/announcements', async (req, res) => {
+  const limit = Math.min(20, Number(req.query.limit) || 6)
+  let q = db
+    .from('announcements')
+    .select('id, title, body, category, is_pinned, published_at')
+    .eq('is_published', true)
+    .order('is_pinned', { ascending: false })
+    .order('published_at', { ascending: false })
+    .limit(limit)
+  if (req.query.pinned === '1') q = q.eq('is_pinned', true)
+  const { data, error } = await q
+  if (error) return res.json([]) // table may not exist until migration 003 runs
+  res.json(data)
+})
+
 /* ---------- Products ---------- */
 
 router.get('/products', async (_req, res) => {

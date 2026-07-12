@@ -284,6 +284,83 @@ router.delete('/capacity-blocks/:id', async (req, res) => {
 
 router.use(requireSuper)
 
+/* ---------- Announcements CRUD (superadmin) ---------- */
+
+const ANN_MIGRATION_HINT =
+  'Announcements are not set up yet — run supabase/migration-003-announcements.sql in the Supabase SQL Editor.'
+
+router.get('/announcements', async (_req, res) => {
+  const { data, error } = await db
+    .from('announcements')
+    .select('*')
+    .order('is_pinned', { ascending: false })
+    .order('published_at', { ascending: false })
+  if (error) {
+    if (/announcements/.test(error.message)) return res.status(503).json({ error: ANN_MIGRATION_HINT })
+    return res.status(500).json({ error: error.message })
+  }
+  res.json(data)
+})
+
+router.post('/announcements', async (req, res) => {
+  const { title, body, category, is_published, is_pinned } = req.body || {}
+  if (!title?.trim()) return res.status(400).json({ error: 'Title is required' })
+  const cat = ['news', 'hiring', 'advisory'].includes(category) ? category : 'news'
+
+  if (is_pinned) await db.from('announcements').update({ is_pinned: false }).eq('is_pinned', true)
+
+  const { data, error } = await db
+    .from('announcements')
+    .insert({
+      title: title.trim(),
+      body: body || '',
+      category: cat,
+      is_published: is_published !== false,
+      is_pinned: !!is_pinned,
+    })
+    .select()
+    .single()
+  if (error) {
+    if (/announcements/.test(error.message)) return res.status(503).json({ error: ANN_MIGRATION_HINT })
+    return res.status(500).json({ error: error.message })
+  }
+  res.status(201).json(data)
+})
+
+router.patch('/announcements/:id', async (req, res) => {
+  const updates = {}
+  if (req.body?.title !== undefined) updates.title = String(req.body.title).trim()
+  if (req.body?.body !== undefined) updates.body = req.body.body
+  if (req.body?.category !== undefined && ['news', 'hiring', 'advisory'].includes(req.body.category))
+    updates.category = req.body.category
+  if (req.body?.is_published !== undefined) updates.is_published = !!req.body.is_published
+  if (req.body?.is_pinned !== undefined) updates.is_pinned = !!req.body.is_pinned
+  if (Object.keys(updates).length === 0) return res.status(400).json({ error: 'Nothing to update' })
+
+  if (updates.is_pinned === true) await db.from('announcements').update({ is_pinned: false }).eq('is_pinned', true)
+
+  const { data, error } = await db
+    .from('announcements')
+    .update(updates)
+    .eq('id', Number(req.params.id))
+    .select()
+    .single()
+  if (error) return res.status(500).json({ error: error.message })
+  res.json(data)
+})
+
+router.delete('/announcements/:id', async (req, res) => {
+  const { data, error } = await db
+    .from('announcements')
+    .delete()
+    .eq('id', Number(req.params.id))
+    .select('id')
+    .maybeSingle()
+  if (error) return res.status(500).json({ error: error.message })
+  if (!data) return res.status(404).json({ error: 'Announcement not found' })
+  res.json({ deleted: data.id })
+})
+
 /* ---------- Branches CRUD ---------- */
 
 router.get('/branches', async (_req, res) => {

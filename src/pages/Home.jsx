@@ -4,7 +4,8 @@ import { STATIC_MODE } from '../config.js'
 import Aurora from '../components/bits/Aurora.jsx'
 import BlurText from '../components/bits/BlurText.jsx'
 import CountUp from '../components/bits/CountUp.jsx'
-import { HeartPulseIcon, BeakerIcon, SyringeIcon, FileTextIcon, CheckIcon } from '../components/Icons.jsx'
+import { HeartPulseIcon, BeakerIcon, SyringeIcon, FileTextIcon, CheckIcon, MegaphoneIcon } from '../components/Icons.jsx'
+import { api } from '../api.js'
 
 const SERVICES = [
   {
@@ -49,10 +50,18 @@ const HERO_BG_IMAGES = [
   '/ls-injection.jpg',
 ]
 
+const CATEGORY_LABELS = { news: 'News', hiring: "We're Hiring", advisory: 'Advisory' }
+
 export default function Home() {
   const location = useLocation()
   const [bgIndex, setBgIndex] = useState(0)
   const [prevBgIndex, setPrevBgIndex] = useState(0)
+  const [announcements, setAnnouncements] = useState([])
+
+  useEffect(() => {
+    if (STATIC_MODE) return
+    api.get('/announcements?limit=4').then(setAnnouncements).catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (location.hash) {
@@ -192,6 +201,34 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {announcements.length > 0 && (
+        <section id="news" className="section">
+          <span className="section-eyebrow">What's new</span>
+          <h2>News &amp; Announcements</h2>
+          <p className="section-sub">Updates, advisories, and openings from Life Saver Care Circle.</p>
+          <div className="ann-grid">
+            {announcements.map((a) => (
+              <article key={a.id} className="ann-card">
+                <div className="ann-card-head">
+                  <span className={`ann-chip ann-${a.category}`}>
+                    <MegaphoneIcon size={13} /> {CATEGORY_LABELS[a.category] || 'News'}
+                  </span>
+                  <time dateTime={a.published_at}>
+                    {new Date(a.published_at).toLocaleDateString('en-PH', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </time>
+                </div>
+                <h3>{a.title}</h3>
+                {a.body && <p className="ann-body">{a.body}</p>}
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section id="about" className="section section-alt">
         <div className="about-inner">

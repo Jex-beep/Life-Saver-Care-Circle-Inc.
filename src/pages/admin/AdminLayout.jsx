@@ -8,6 +8,7 @@ import {
   GaugeIcon,
   SettingsIcon,
   BuildingIcon,
+  MegaphoneIcon,
   LogOutIcon,
 } from '../../components/Icons.jsx'
 
@@ -18,6 +19,7 @@ const PAGE_TITLES = {
   '/admin/capacity': 'Capacity & Sessions',
   '/admin/schedule': 'Weekly Schedule',
   '/admin/settings': 'Branch Settings',
+  '/admin/announcements': 'Announcements',
   '/admin/manage': 'Manage System',
 }
 
@@ -70,6 +72,7 @@ export default function AdminLayout() {
         <nav className="adm-nav">
           {!isSuper && <NavItem to="/admin/schedule" Icon={ClockIcon}>Schedule</NavItem>}
           {!isSuper && <NavItem to="/admin/settings" Icon={SettingsIcon}>Branch Settings</NavItem>}
+          {isSuper && <NavItem to="/admin/announcements" Icon={MegaphoneIcon}>Announcements</NavItem>}
           {isSuper && <NavItem to="/admin/manage" Icon={BuildingIcon}>Manage System</NavItem>}
         </nav>
 

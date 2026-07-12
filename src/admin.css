@@ -604,6 +604,111 @@
   background: rgba(198, 40, 64, 0.06);
 }
 
+/* ---------- Announcements admin ---------- */
+
+.ann-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ann-form-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.ann-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text);
+}
+
+.ann-form label.grow {
+  flex: 1;
+  min-width: 240px;
+}
+
+.ann-form input,
+.ann-form select,
+.ann-form textarea {
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+  min-height: 44px;
+}
+
+.ann-form textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.ann-form input:focus,
+.ann-form select:focus,
+.ann-form textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.ann-check {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--text-h) !important;
+}
+
+.ann-check input {
+  min-height: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.ann-admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+
+.ann-admin-row:first-of-type {
+  border-top: none;
+}
+
+.ann-admin-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.ann-admin-meta strong {
+  color: var(--text-h);
+}
+
+.ann-admin-date {
+  font-size: 13px;
+  color: var(--text);
+}
+
 /* ---------- Tables ---------- */
 
 .admin-table {

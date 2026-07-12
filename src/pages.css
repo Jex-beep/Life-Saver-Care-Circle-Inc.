@@ -554,6 +554,133 @@
   gap: 28px;
   flex-wrap: wrap;
 }
+/* ---------- Announcements ---------- */
+
+.ann-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 9px 44px 9px 16px;
+  background: linear-gradient(90deg, var(--accent-strong), var(--accent));
+  color: #fff;
+  font-size: 14px;
+  position: relative;
+  text-align: center;
+}
+
+.ann-bar-text {
+  color: #fff;
+  text-decoration: none;
+}
+
+.ann-bar-text:hover {
+  text-decoration: underline;
+}
+
+.ann-bar-close {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transition: background-color var(--transition);
+}
+
+.ann-bar-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.ann-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  text-align: left;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.ann-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.ann-card:hover {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.ann-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ann-card-head time {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.ann-card h3 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.ann-body {
+  font-size: 14.5px;
+  line-height: 1.65;
+  white-space: pre-line;
+}
+
+.ann-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.ann-news {
+  background: var(--accent-bg);
+  color: var(--accent-strong);
+  border: 1px solid var(--accent-border);
+}
+
+.ann-hiring {
+  background: rgba(232, 71, 31, 0.08);
+  color: var(--warm-strong);
+  border: 1px solid rgba(232, 71, 31, 0.3);
+}
+
+.ann-advisory {
+  background: rgba(217, 119, 6, 0.1);
+  color: #b45309;
+  border: 1px solid rgba(217, 119, 6, 0.35);
+}
+
+@media (max-width: 860px) {
+  .ann-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------- Badges ---------- */
 
 .badge {

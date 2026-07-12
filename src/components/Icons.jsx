@@ -180,6 +180,13 @@ export const BuildingIcon = (props) => (
   </Icon>
 )
 
+export const MegaphoneIcon = (props) => (
+  <Icon {...props}>
+    <path d="m3 11 18-5v12L3 14v-3z" />
+    <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+  </Icon>
+)
+
 export const LogOutIcon = (props) => (
   <Icon {...props}>
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

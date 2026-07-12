@@ -7,6 +7,7 @@ import Dashboard from './Dashboard.jsx'
 import AdminBookings from './AdminBookings.jsx'
 import AdminOrders from './AdminOrders.jsx'
 import Capacity from './Capacity.jsx'
+import Announcements from './Announcements.jsx'
 import Schedule from './Schedule.jsx'
 import Settings from './Settings.jsx'
 import Manage from './Manage.jsx'
@@ -44,6 +45,7 @@ export default function AdminRoutes() {
             <Route path="capacity" element={<Capacity />} />
             <Route path="schedule" element={<Schedule />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="announcements" element={value.isSuper ? <Announcements /> : <Navigate to="/admin" replace />} />
             <Route path="manage" element={value.isSuper ? <Manage /> : <Navigate to="/admin" replace />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Route>

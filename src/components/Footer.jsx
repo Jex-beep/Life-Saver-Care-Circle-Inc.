@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { STATIC_MODE } from '../config.js'
+import { PhoneIcon, MailIcon, FacebookIcon } from './Icons.jsx'
 
 export default function Footer() {
   return (
@@ -16,21 +18,46 @@ export default function Footer() {
           <h4>Quick Links</h4>
           <p><Link to="/about">About Us</Link></p>
           <p><Link to="/branches">Find a Branch</Link></p>
-          <p><Link to="/book">Book an Appointment</Link></p>
-          <p><Link to="/pharmacy">Order Medicines</Link></p>
-          <p><Link to="/track">Track Booking / Order</Link></p>
+          {STATIC_MODE ? (
+            <p><Link to="/pharmacy">Our Pharmacies</Link></p>
+          ) : (
+            <>
+              <p><Link to="/book">Book an Appointment</Link></p>
+              <p><Link to="/pharmacy">Order Medicines</Link></p>
+              <p><Link to="/track">Track Booking / Order</Link></p>
+            </>
+          )}
         </div>
         <div>
           <h4>Contact</h4>
-          <p>123 Wellness Ave, Suite 100</p>
-          <p>(555) 123-4567</p>
-          <p>hello@lifesavercarecircle.example</p>
+          <p>
+            <a href="tel:+639325688028" className="footer-contact">
+              <PhoneIcon size={15} className="inline-icon" /> 0932 568 8028
+            </a>
+          </p>
+          <p>
+            <a href="mailto:info@lscarecircle.com.ph" className="footer-contact">
+              <MailIcon size={15} className="inline-icon" /> info@lscarecircle.com.ph
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://www.facebook.com/LifeSaverServicesPH"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-contact"
+            >
+              <FacebookIcon size={15} className="inline-icon" /> Life Saver Services PH
+            </a>
+          </p>
         </div>
         <div>
           <h4>Hours</h4>
           <p>Mon–Sat: 8am – 5pm</p>
           <p>Closed Sundays</p>
-          <p className="footer-admin"><Link to="/admin">Staff Login</Link></p>
+          {!STATIC_MODE && (
+            <p className="footer-admin"><Link to="/admin">Staff Login</Link></p>
+          )}
         </div>
       </div>
       <p className="footer-note">

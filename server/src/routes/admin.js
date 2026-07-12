@@ -189,6 +189,95 @@ router.patch('/branch-settings', async (req, res) => {
   res.json(data)
 })
 
+/* ---------- Capacity blocks (per-date booking limits) ---------- */
+
+router.get('/capacity-blocks', async (req, res) => {
+  const branchId = scopedBranchId(req, req.query.branch_id ? Number(req.query.branch_id) : null)
+  if (!branchId) return res.status(400).json({ error: 'branch_id is required' })
+  const from = req.query.from || new Date().toISOString().slice(0, 10)
+  const to = req.query.to || null
+
+  let q = db
+    .from('capacity_blocks')
+    .select('*')
+    .eq('branch_id', branchId)
+    .gte('block_date', from)
+    .order('block_date')
+    .order('start_time')
+  if (to) q = q.lte('block_date', to)
+  const { data: blocks, error } = await q
+  if (error) {
+    if (/capacity_blocks/.test(error.message)) {
+      return res.status(503).json({
+        error: 'Capacity blocks are not set up yet — run supabase/migration-002-capacity-blocks.sql in the Supabase SQL Editor.',
+      })
+    }
+    return res.status(500).json({ error: error.message })
+  }
+
+  /* attach booked counts per block */
+  const dates = [...new Set(blocks.map((b) => b.block_date))]
+  let bookings = []
+  if (dates.length > 0) {
+    const { data } = await db
+      .from('bookings')
+      .select('booking_date, booking_time')
+      .eq('branch_id', branchId)
+      .in('booking_date', dates)
+      .neq('status', 'cancelled')
+    bookings = data || []
+  }
+  const toMin = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5))
+  const withCounts = blocks.map((b) => {
+    const booked = bookings.filter(
+      (x) =>
+        x.booking_date === b.block_date &&
+        toMin(x.booking_time) >= toMin(b.start_time) &&
+        toMin(x.booking_time) < toMin(b.end_time)
+    ).length
+    return { ...b, booked, remaining: Math.max(0, b.max_patients - booked) }
+  })
+  res.json(withCounts)
+})
+
+router.post('/capacity-blocks', async (req, res) => {
+  const branchId = scopedBranchId(req, req.body?.branch_id ? Number(req.body.branch_id) : null)
+  if (!branchId) return res.status(400).json({ error: 'branch_id is required' })
+  const { block_date, start_time, end_time, max_patients, note } = req.body || {}
+  if (!block_date || !start_time || !end_time || max_patients === undefined) {
+    return res.status(400).json({ error: 'block_date, start_time, end_time, and max_patients are required' })
+  }
+  if (end_time <= start_time) return res.status(400).json({ error: 'End time must be after start time' })
+  const max = Number(max_patients)
+  if (!Number.isInteger(max) || max < 0 || max > 500) {
+    return res.status(400).json({ error: 'max_patients must be a whole number between 0 and 500' })
+  }
+
+  const { data, error } = await db
+    .from('capacity_blocks')
+    .insert({ branch_id: branchId, block_date, start_time, end_time, max_patients: max, note: note || '' })
+    .select()
+    .single()
+  if (error) {
+    if (/capacity_blocks/.test(error.message)) {
+      return res.status(503).json({
+        error: 'Capacity blocks are not set up yet — run supabase/migration-002-capacity-blocks.sql in the Supabase SQL Editor.',
+      })
+    }
+    return res.status(500).json({ error: error.message })
+  }
+  res.status(201).json(data)
+})
+
+router.delete('/capacity-blocks/:id', async (req, res) => {
+  let q = db.from('capacity_blocks').delete().eq('id', Number(req.params.id))
+  if (req.admin.role !== 'super') q = q.eq('branch_id', req.admin.branch_id)
+  const { data, error } = await q.select('id').maybeSingle()
+  if (error) return res.status(500).json({ error: error.message })
+  if (!data) return res.status(404).json({ error: 'Block not found for your branch' })
+  res.json({ deleted: data.id })
+})
+
 /* ============================================================
    Corporate (super admin) only below
    ============================================================ */

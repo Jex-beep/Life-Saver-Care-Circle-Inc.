@@ -1,8 +1,28 @@
 import { Router } from 'express'
 import { db } from '../supabase.js'
-import { makeReference, buildSlots, localDateStr } from '../helpers.js'
+import { makeReference, buildSlots, localDateStr, timeToMinutes, minutesToTime } from '../helpers.js'
 
 const router = Router()
+
+/* capacity_blocks is added by migration 002 — treat a missing table as "no blocks" */
+async function getBlocks(branchId, fromDate, toDate) {
+  const { data, error } = await db
+    .from('capacity_blocks')
+    .select('*')
+    .eq('branch_id', branchId)
+    .gte('block_date', fromDate)
+    .lte('block_date', toDate)
+    .order('start_time')
+  if (error) return []
+  return data
+}
+
+const pad2 = (n) => String(n).padStart(2, '0')
+
+function inBlock(block, timeStr) {
+  const t = timeToMinutes(timeStr)
+  return t >= timeToMinutes(block.start_time) && t < timeToMinutes(block.end_time)
+}
 
 /* ---------- Branches ---------- */
 
@@ -30,6 +50,67 @@ router.get('/services', async (_req, res) => {
   res.json(data)
 })
 
+/* ---------- Month availability overview (for the booking calendar) ---------- */
+
+router.get('/branches/:id/availability', async (req, res) => {
+  const branchId = Number(req.params.id)
+  const year = Number(req.query.year)
+  const month = Number(req.query.month) // 1-12
+  if (!year || !month || month < 1 || month > 12) {
+    return res.status(400).json({ error: 'year and month (1-12) are required' })
+  }
+
+  const lastDay = new Date(year, month, 0).getDate()
+  const first = `${year}-${pad2(month)}-01`
+  const last = `${year}-${pad2(month)}-${pad2(lastDay)}`
+
+  const [{ data: schedules, error: schedErr }, blocks, { data: bookings, error: bookErr }] = await Promise.all([
+    db.from('branch_schedules').select('*').eq('branch_id', branchId),
+    getBlocks(branchId, first, last),
+    db
+      .from('bookings')
+      .select('booking_date')
+      .eq('branch_id', branchId)
+      .gte('booking_date', first)
+      .lte('booking_date', last)
+      .neq('status', 'cancelled'),
+  ])
+  if (schedErr) return res.status(500).json({ error: schedErr.message })
+  if (bookErr) return res.status(500).json({ error: bookErr.message })
+
+  const bookedByDate = {}
+  for (const b of bookings) bookedByDate[b.booking_date] = (bookedByDate[b.booking_date] || 0) + 1
+
+  const today = localDateStr()
+  const days = {}
+  for (let d = 1; d <= lastDay; d++) {
+    const date = `${year}-${pad2(month)}-${pad2(d)}`
+    const weekday = new Date(year, month - 1, d).getDay()
+    const sched = schedules.find((s) => s.weekday === weekday)
+    const dayBlocks = blocks.filter((b) => b.block_date === date)
+    const booked = bookedByDate[date] || 0
+
+    let capacity = 0
+    if (dayBlocks.length > 0) {
+      capacity = dayBlocks.reduce((sum, b) => sum + b.max_patients, 0)
+    } else if (sched && sched.is_open) {
+      capacity = buildSlots(sched).length * sched.capacity
+    }
+
+    const remaining = Math.max(0, capacity - booked)
+    let status
+    if (date < today) status = 'past'
+    else if (capacity === 0) status = 'closed'
+    else if (remaining === 0) status = 'full'
+    else if (remaining <= Math.max(1, Math.ceil(capacity * 0.2))) status = 'limited'
+    else status = 'available'
+
+    days[date] = { status, capacity, booked, remaining }
+  }
+
+  res.json({ days })
+})
+
 /* ---------- Available slots for a branch on a date ---------- */
 
 router.get('/branches/:id/slots', async (req, res) => {
@@ -40,40 +121,77 @@ router.get('/branches/:id/slots', async (req, res) => {
   }
   const weekday = new Date(`${date}T00:00:00`).getDay()
 
-  const { data: schedule, error: schedErr } = await db
-    .from('branch_schedules')
-    .select('*')
-    .eq('branch_id', branchId)
-    .eq('weekday', weekday)
-    .maybeSingle()
+  const [{ data: schedule, error: schedErr }, dayBlocks, { data: booked, error: bookErr }] = await Promise.all([
+    db.from('branch_schedules').select('*').eq('branch_id', branchId).eq('weekday', weekday).maybeSingle(),
+    getBlocks(branchId, date, date),
+    db
+      .from('bookings')
+      .select('booking_time')
+      .eq('branch_id', branchId)
+      .eq('booking_date', date)
+      .neq('status', 'cancelled'),
+  ])
   if (schedErr) return res.status(500).json({ error: schedErr.message })
-  if (!schedule || !schedule.is_open) return res.json({ open: false, slots: [] })
-
-  const { data: booked, error: bookErr } = await db
-    .from('bookings')
-    .select('booking_time')
-    .eq('branch_id', branchId)
-    .eq('booking_date', date)
-    .neq('status', 'cancelled')
   if (bookErr) return res.status(500).json({ error: bookErr.message })
+
+  const hasBlocks = dayBlocks.length > 0
+  const scheduleOpen = schedule && schedule.is_open
+  const blocksOpen = dayBlocks.some((b) => b.max_patients > 0)
+  if ((hasBlocks && !blocksOpen) || (!hasBlocks && !scheduleOpen)) {
+    return res.json({ open: false, slots: [], sessions: [] })
+  }
 
   const counts = {}
   for (const b of booked) counts[b.booking_time.slice(0, 5)] = (counts[b.booking_time.slice(0, 5)] || 0) + 1
+
+  /* per-session booked totals */
+  const sessions = dayBlocks.map((b) => {
+    const bookedInBlock = booked.filter((x) => inBlock(b, x.booking_time)).length
+    return {
+      id: b.id,
+      start_time: b.start_time.slice(0, 5),
+      end_time: b.end_time.slice(0, 5),
+      max_patients: b.max_patients,
+      booked: bookedInBlock,
+      remaining: Math.max(0, b.max_patients - bookedInBlock),
+      note: b.note || '',
+    }
+  })
+
+  const slotMinutes = schedule?.slot_minutes || 30
+  const perSlotCap = scheduleOpen ? schedule.capacity : 999 // block limit governs on block-opened days
+
+  /* Build slot times: from block windows when blocks exist, else the weekly schedule */
+  let slotTimes
+  if (hasBlocks) {
+    slotTimes = []
+    for (const b of dayBlocks) {
+      if (b.max_patients === 0) continue
+      const open = timeToMinutes(b.start_time)
+      const close = timeToMinutes(b.end_time)
+      for (let t = open; t + slotMinutes <= close; t += slotMinutes) slotTimes.push(minutesToTime(t))
+    }
+    slotTimes = [...new Set(slotTimes)].sort()
+  } else {
+    slotTimes = buildSlots(schedule)
+  }
 
   const now = new Date()
   const isToday = date === localDateStr(now)
   const nowMinutes = now.getHours() * 60 + now.getMinutes()
 
-  const slots = buildSlots(schedule).map((time) => {
+  const slots = slotTimes.map((time) => {
     const [h, m] = time.split(':').map(Number)
     const past = isToday && h * 60 + m <= nowMinutes
-    return {
-      time,
-      available: !past && (counts[time] || 0) < schedule.capacity,
+    let available = !past && (counts[time] || 0) < perSlotCap
+    if (available && hasBlocks) {
+      const session = sessions.find((s) => inBlock({ start_time: s.start_time, end_time: s.end_time }, time))
+      available = !!session && session.remaining > 0
     }
+    return { time, available }
   })
 
-  res.json({ open: true, slots })
+  res.json({ open: true, slots, sessions })
 })
 
 /* ---------- Create booking (instant confirmation) ---------- */
@@ -85,24 +203,44 @@ router.post('/bookings', async (req, res) => {
     return res.status(400).json({ error: 'Missing required booking details' })
   }
 
-  // Re-check the slot is still free (capacity)
+  // Re-check the slot is still free (schedule + capacity blocks)
   const weekday = new Date(`${booking_date}T00:00:00`).getDay()
-  const { data: schedule } = await db
-    .from('branch_schedules')
-    .select('capacity, is_open')
-    .eq('branch_id', branch_id)
-    .eq('weekday', weekday)
-    .maybeSingle()
-  if (!schedule || !schedule.is_open) return res.status(409).json({ error: 'Branch is closed on that date' })
+  const [{ data: schedule }, dayBlocks, { data: dayBookings }] = await Promise.all([
+    db
+      .from('branch_schedules')
+      .select('capacity, is_open')
+      .eq('branch_id', branch_id)
+      .eq('weekday', weekday)
+      .maybeSingle(),
+    getBlocks(branch_id, booking_date, booking_date),
+    db
+      .from('bookings')
+      .select('booking_time')
+      .eq('branch_id', branch_id)
+      .eq('booking_date', booking_date)
+      .neq('status', 'cancelled'),
+  ])
 
-  const { count } = await db
-    .from('bookings')
-    .select('id', { count: 'exact', head: true })
-    .eq('branch_id', branch_id)
-    .eq('booking_date', booking_date)
-    .eq('booking_time', booking_time)
-    .neq('status', 'cancelled')
-  if ((count || 0) >= schedule.capacity) {
+  const hasBlocks = dayBlocks.length > 0
+  const scheduleOpen = schedule && schedule.is_open
+  if (!hasBlocks && !scheduleOpen) {
+    return res.status(409).json({ error: 'Branch is closed on that date' })
+  }
+
+  if (hasBlocks) {
+    const block = dayBlocks.find((b) => b.max_patients > 0 && inBlock(b, `${booking_time}:00`))
+    if (!block) {
+      return res.status(409).json({ error: 'That time is outside the clinic sessions for this date' })
+    }
+    const bookedInBlock = dayBookings.filter((x) => inBlock(block, x.booking_time)).length
+    if (bookedInBlock >= block.max_patients) {
+      return res.status(409).json({ error: 'Sorry, that session just filled up. Please pick another time.' })
+    }
+  }
+
+  const perSlotCap = scheduleOpen ? schedule.capacity : 999
+  const sameSlot = dayBookings.filter((x) => x.booking_time.slice(0, 5) === booking_time).length
+  if (sameSlot >= perSlotCap) {
     return res.status(409).json({ error: 'Sorry, that slot was just taken. Please pick another time.' })
   }
 

@@ -1,16 +1,25 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import { STATIC_MODE } from '../config.js'
 import { useCart } from '../context/CartContext.jsx'
 import { CartIcon } from './Icons.jsx'
 
-const NAV_LINKS = [
-  { label: 'Home', to: '/' },
-  { label: 'About', to: '/about' },
-  { label: 'Branches', to: '/branches' },
-  { label: 'Pharmacy', to: '/pharmacy' },
-  { label: 'Track', to: '/track' },
-  { label: 'Contact', to: '/#contact' },
-]
+const NAV_LINKS = STATIC_MODE
+  ? [
+      { label: 'Home', to: '/' },
+      { label: 'About', to: '/about' },
+      { label: 'Branches', to: '/branches' },
+      { label: 'Pharmacy', to: '/pharmacy' },
+      { label: 'Contact', to: '/#contact' },
+    ]
+  : [
+      { label: 'Home', to: '/' },
+      { label: 'About', to: '/about' },
+      { label: 'Branches', to: '/branches' },
+      { label: 'Pharmacy', to: '/pharmacy' },
+      { label: 'Track', to: '/track' },
+      { label: 'Contact', to: '/#contact' },
+    ]
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -57,14 +66,20 @@ export default function Navbar() {
               </NavLink>
             )
           )}
-          {cart?.count > 0 && (
+          {!STATIC_MODE && cart?.count > 0 && (
             <Link to="/pharmacy" className="cart-pill" onClick={() => setMenuOpen(false)}>
               <CartIcon size={16} /> {cart.count}
             </Link>
           )}
-          <Link to="/book" className="nav-cta" onClick={() => setMenuOpen(false)}>
-            Book Now
-          </Link>
+          {STATIC_MODE ? (
+            <Link to="/branches" className="nav-cta" onClick={() => setMenuOpen(false)}>
+              Find a Branch
+            </Link>
+          ) : (
+            <Link to="/book" className="nav-cta" onClick={() => setMenuOpen(false)}>
+              Book Now
+            </Link>
+          )}
         </nav>
       </div>
     </header>

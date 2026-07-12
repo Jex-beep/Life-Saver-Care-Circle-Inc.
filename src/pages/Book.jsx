@@ -5,9 +5,74 @@ import { branchBadges } from './Branches.jsx'
 import { CheckCircleIcon } from '../components/Icons.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 
-const todayStr = () => {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+const pad2 = (n) => String(n).padStart(2, '0')
+
+/* Month grid showing per-day availability from GET /branches/:id/availability */
+function AvailabilityCalendar({ cursor, onCursor, days, selected, onSelect, loading }) {
+  const now = new Date()
+  const atCurrentMonth = cursor.y === now.getFullYear() && cursor.m === now.getMonth() + 1
+  const firstWeekday = new Date(cursor.y, cursor.m - 1, 1).getDay()
+  const daysInMonth = new Date(cursor.y, cursor.m, 0).getDate()
+
+  const move = (delta) => {
+    let y = cursor.y
+    let m = cursor.m + delta
+    if (m < 1) { m = 12; y-- }
+    if (m > 12) { m = 1; y++ }
+    onCursor({ y, m })
+  }
+
+  return (
+    <div className="cal">
+      <div className="cal-head">
+        <button type="button" className="cal-nav" onClick={() => move(-1)} disabled={atCurrentMonth} aria-label="Previous month">
+          ‹
+        </button>
+        <span className="cal-title">{MONTHS[cursor.m - 1]} {cursor.y}</span>
+        <button type="button" className="cal-nav" onClick={() => move(1)} aria-label="Next month">
+          ›
+        </button>
+      </div>
+      <div className="cal-grid" role="grid" aria-busy={loading}>
+        {WEEKDAYS.map((w) => (
+          <span key={w} className="cal-weekday">{w}</span>
+        ))}
+        {Array.from({ length: firstWeekday }).map((_, i) => (
+          <span key={`pad-${i}`} />
+        ))}
+        {Array.from({ length: daysInMonth }).map((_, i) => {
+          const date = `${cursor.y}-${pad2(cursor.m)}-${pad2(i + 1)}`
+          const info = days?.[date]
+          const status = info?.status || 'closed'
+          const clickable = status === 'available' || status === 'limited'
+          return (
+            <button
+              key={date}
+              type="button"
+              className={`cal-day is-${status} ${selected === date ? 'is-selected' : ''}`}
+              disabled={!clickable}
+              onClick={() => onSelect(date)}
+              title={
+                info && status !== 'past' && status !== 'closed'
+                  ? `${info.remaining} of ${info.capacity} slots left`
+                  : undefined
+              }
+            >
+              {i + 1}
+            </button>
+          )
+        })}
+      </div>
+      <div className="cal-legend">
+        <span><i className="dot dot-available" /> Available</span>
+        <span><i className="dot dot-limited" /> Few slots left</span>
+        <span><i className="dot dot-full" /> Fully booked</span>
+        <span><i className="dot dot-closed" /> Closed</span>
+      </div>
+    </div>
+  )
 }
 
 export default function Book() {
@@ -18,7 +83,13 @@ export default function Book() {
 
   const [branchId, setBranchId] = useState(params.get('branch') ? Number(params.get('branch')) : null)
   const [serviceId, setServiceId] = useState(null)
-  const [date, setDate] = useState(todayStr())
+  const [date, setDate] = useState(null)
+  const [cursor, setCursor] = useState(() => {
+    const d = new Date()
+    return { y: d.getFullYear(), m: d.getMonth() + 1 }
+  })
+  const [avail, setAvail] = useState(null)
+  const [availLoading, setAvailLoading] = useState(false)
   const [slots, setSlots] = useState(null)
   const [time, setTime] = useState(null)
   const [form, setForm] = useState({ patient_name: '', phone: '', email: '', philhealth_no: '', notes: '' })
@@ -33,6 +104,18 @@ export default function Book() {
       })
       .catch((e) => setError(e.message))
   }, [])
+
+  // load the month availability overview whenever branch/month changes
+  useEffect(() => {
+    setAvail(null)
+    if (!branchId) return
+    setAvailLoading(true)
+    api
+      .get(`/branches/${branchId}/availability?year=${cursor.y}&month=${cursor.m}`)
+      .then(setAvail)
+      .catch((e) => setError(e.message))
+      .finally(() => setAvailLoading(false))
+  }, [branchId, cursor])
 
   // load slots whenever branch/date changes
   useEffect(() => {
@@ -161,29 +244,63 @@ export default function Book() {
             <strong>{branch?.name}</strong> · {service?.name}{' '}
             <button className="link-btn" onClick={() => setServiceId(null)}>change</button>
           </p>
-          <div className="filter-bar">
-            <label>
-              Date:{' '}
-              <input type="date" value={date} min={todayStr()} onChange={(e) => setDate(e.target.value)} />
-            </label>
-          </div>
-          {!slots && <p className="muted center">Checking availability…</p>}
-          {slots && !slots.open && <p className="error-box">This branch is closed on that date — try another day.</p>}
-          {slots?.open && (
-            <div className="slot-grid">
-              {slots.slots.map((s) => (
-                <button
-                  key={s.time}
-                  type="button"
-                  className="slot"
-                  disabled={!s.available}
-                  onClick={() => setTime(s.time)}
-                >
-                  {s.time}
-                </button>
-              ))}
+          <div className="date-time-layout">
+            <AvailabilityCalendar
+              cursor={cursor}
+              onCursor={setCursor}
+              days={avail?.days}
+              selected={date}
+              onSelect={setDate}
+              loading={availLoading}
+            />
+
+            <div className="slot-pane">
+              {!date && (
+                <p className="muted slot-hint">
+                  Pick an available date on the calendar to see its time slots.
+                </p>
+              )}
+              {date && !slots && <p className="muted slot-hint">Checking {date}…</p>}
+              {date && slots && !slots.open && (
+                <p className="error-box">This branch is closed on that date — try another day.</p>
+              )}
+              {date && slots?.open && (
+                <>
+                  <p className="slot-pane-title">
+                    {new Date(`${date}T00:00:00`).toLocaleDateString('en-PH', {
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
+                  {slots.sessions?.length > 0 && (
+                    <div className="session-chips">
+                      {slots.sessions.map((s) => (
+                        <span key={s.id} className={`session-chip ${s.remaining === 0 ? 'is-full' : ''}`}>
+                          <strong>{s.start_time}–{s.end_time}</strong>
+                          {s.note && <em>{s.note}</em>}
+                          <span>{s.remaining === 0 ? 'Full' : `${s.remaining} of ${s.max_patients} left`}</span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="slot-grid">
+                    {slots.slots.map((s) => (
+                      <button
+                        key={s.time}
+                        type="button"
+                        className="slot"
+                        disabled={!s.available}
+                        onClick={() => setTime(s.time)}
+                      >
+                        {s.time}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
-          )}
+          </div>
         </>
       )}
 

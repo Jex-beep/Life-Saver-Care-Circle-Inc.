@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { STATIC_MODE } from '../config.js'
 import BlurText from '../components/bits/BlurText.jsx'
 import CountUp from '../components/bits/CountUp.jsx'
 import {
@@ -217,10 +218,21 @@ export default function About() {
         <p className="ab-kicker dark">Ready when you are</p>
         <h2>Be part of healthier communities.</h2>
         <div className="ab-cta-actions">
-          <Link to="/book" className="btn btn-primary">Book an Appointment</Link>
-          <Link to="/pharmacy" className="ab-arrow-link">
-            Order medicines <span aria-hidden="true">→</span>
-          </Link>
+          {STATIC_MODE ? (
+            <>
+              <Link to="/branches" className="btn btn-primary">Find a Branch</Link>
+              <Link to="/pharmacy" className="ab-arrow-link">
+                Our pharmacies <span aria-hidden="true">→</span>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/book" className="btn btn-primary">Book an Appointment</Link>
+              <Link to="/pharmacy" className="ab-arrow-link">
+                Order medicines <span aria-hidden="true">→</span>
+              </Link>
+            </>
+          )}
         </div>
       </section>
     </article>

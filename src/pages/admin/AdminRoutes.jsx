@@ -6,6 +6,7 @@ import AdminLayout from './AdminLayout.jsx'
 import Dashboard from './Dashboard.jsx'
 import AdminBookings from './AdminBookings.jsx'
 import AdminOrders from './AdminOrders.jsx'
+import Capacity from './Capacity.jsx'
 import Schedule from './Schedule.jsx'
 import Settings from './Settings.jsx'
 import Manage from './Manage.jsx'
@@ -40,6 +41,7 @@ export default function AdminRoutes() {
             <Route index element={<Dashboard />} />
             <Route path="bookings" element={<AdminBookings />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="capacity" element={<Capacity />} />
             <Route path="schedule" element={<Schedule />} />
             <Route path="settings" element={<Settings />} />
             <Route path="manage" element={value.isSuper ? <Manage /> : <Navigate to="/admin" replace />} />

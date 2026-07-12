@@ -58,6 +58,7 @@ export const adminApi = {
   post: (path, body) => adminRequest(path, { method: 'POST', body }),
   patch: (path, body) => adminRequest(path, { method: 'PATCH', body }),
   put: (path, body) => adminRequest(path, { method: 'PUT', body }),
+  delete: (path) => adminRequest(path, { method: 'DELETE' }),
 }
 
 export const peso = (n) =>

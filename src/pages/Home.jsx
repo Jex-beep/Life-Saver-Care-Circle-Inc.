@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { STATIC_MODE } from '../config.js'
 import Aurora from '../components/bits/Aurora.jsx'
 import BlurText from '../components/bits/BlurText.jsx'
 import CountUp from '../components/bits/CountUp.jsx'
@@ -105,12 +106,25 @@ export default function Home() {
               preferred branch or order your medicines online.
             </p>
             <div className="hero-actions">
-              <Link to="/book" className="btn btn-primary">
-                Book an Appointment
-              </Link>
-              <Link to="/pharmacy" className="btn btn-secondary">
-                Order Medicines
-              </Link>
+              {STATIC_MODE ? (
+                <>
+                  <Link to="/branches" className="btn btn-primary">
+                    Find a Branch
+                  </Link>
+                  <Link to="/pharmacy" className="btn btn-secondary">
+                    Our Pharmacies
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/book" className="btn btn-primary">
+                    Book an Appointment
+                  </Link>
+                  <Link to="/pharmacy" className="btn btn-secondary">
+                    Order Medicines
+                  </Link>
+                </>
+              )}
             </div>
             <div className="hero-badges">
               <span className="badge badge-yakap">Yakap</span> PhilHealth-accredited Primary Care
@@ -153,9 +167,15 @@ export default function Home() {
           ))}
         </div>
         <p className="section-cta">
-          <Link to="/book" className="btn btn-primary">
-            Book a Service
-          </Link>
+          {STATIC_MODE ? (
+            <Link to="/branches" className="btn btn-primary">
+              Visit a Branch
+            </Link>
+          ) : (
+            <Link to="/book" className="btn btn-primary">
+              Book a Service
+            </Link>
+          )}
         </p>
       </section>
 
@@ -223,16 +243,33 @@ export default function Home() {
 
       <section id="bookings" className="section booking-banner">
         <div className="booking-banner-content">
-          <h2>Ready to Book a Visit?</h2>
-          <p>Pick your preferred branch, choose a time slot, and get instant confirmation with a reference number.</p>
-          <div className="hero-actions" style={{ justifyContent: 'center' }}>
-            <Link to="/book" className="btn btn-light">
-              Book an Appointment
-            </Link>
-            <Link to="/track" className="btn btn-outline-light">
-              Track a Booking
-            </Link>
-          </div>
+          {STATIC_MODE ? (
+            <>
+              <h2>Visit Your Nearest Branch Today</h2>
+              <p>Walk-ins are welcome at all our Yakap clinics — Monday to Saturday, 8:00 AM to 5:00 PM.</p>
+              <div className="hero-actions" style={{ justifyContent: 'center' }}>
+                <Link to="/branches" className="btn btn-light">
+                  Find a Branch
+                </Link>
+                <Link to="/about" className="btn btn-outline-light">
+                  Learn About Us
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2>Ready to Book a Visit?</h2>
+              <p>Pick your preferred branch, choose a time slot, and get instant confirmation with a reference number.</p>
+              <div className="hero-actions" style={{ justifyContent: 'center' }}>
+                <Link to="/book" className="btn btn-light">
+                  Book an Appointment
+                </Link>
+                <Link to="/track" className="btn btn-outline-light">
+                  Track a Booking
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </section>
     </>

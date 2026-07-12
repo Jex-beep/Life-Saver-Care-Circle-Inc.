@@ -701,6 +701,23 @@ code {
   font-weight: 600;
 }
 
+/* ---------- Static pharmacy page ---------- */
+
+.pharmacy-highlights {
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 72px;
+}
+
+.pharmacy-locations h2 {
+  text-align: center;
+}
+
+@media (max-width: 860px) {
+  .pharmacy-highlights {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------- Filter card ---------- */
 
 .filter-card {
@@ -1012,6 +1029,210 @@ code {
   text-decoration: line-through;
 }
 
+/* ---------- Availability calendar (booking step 3) ---------- */
+
+.date-time-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 32px;
+  align-items: start;
+  max-width: 980px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.cal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.cal-title {
+  font-family: var(--heading);
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.cal-nav {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+  font-size: 20px;
+  line-height: 1;
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.cal-nav:hover:not(:disabled) {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.cal-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  padding: 4px 0;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  min-height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition: transform var(--transition), border-color var(--transition), background-color var(--transition);
+}
+
+.cal-day.is-available {
+  background: rgba(22, 163, 74, 0.1);
+  color: #15803d;
+}
+
+.cal-day.is-limited {
+  background: rgba(217, 119, 6, 0.12);
+  color: #b45309;
+}
+
+.cal-day.is-full {
+  background: rgba(198, 40, 64, 0.08);
+  color: #c62840;
+  cursor: not-allowed;
+}
+
+.cal-day.is-closed,
+.cal-day.is-past {
+  background: var(--code-bg);
+  color: var(--text);
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.cal-day.is-available:hover,
+.cal-day.is-limited:hover {
+  transform: scale(1.06);
+  border-color: currentColor;
+}
+
+.cal-day.is-selected {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 12px;
+}
+
+.cal-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-available { background: #22a55c; }
+.dot-limited { background: #d97706; }
+.dot-full { background: #c62840; }
+.dot-closed { background: #c9cad6; }
+
+/* Slot pane beside the calendar */
+
+.slot-pane {
+  min-height: 200px;
+}
+
+.slot-hint {
+  padding: 24px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.slot-pane-title {
+  font-family: var(--heading);
+  font-weight: 700;
+  color: var(--text-h);
+  margin-bottom: 14px;
+}
+
+.session-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.session-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-bg);
+  font-size: 13px;
+  color: var(--text-h);
+}
+
+.session-chip em {
+  font-style: normal;
+  color: var(--text);
+}
+
+.session-chip > span {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.session-chip.is-full {
+  border-color: rgba(198, 40, 64, 0.3);
+  background: rgba(198, 40, 64, 0.06);
+}
+
+.session-chip.is-full > span {
+  color: #c62840;
+}
+
+@media (max-width: 860px) {
+  .date-time-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------- Confirmation / tracking ---------- */
 
 .confirm-card {
@@ -1286,6 +1507,17 @@ code {
 .footer-tags {
   margin-top: 10px;
   font-size: 13px;
+}
+
+.footer-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.footer-contact:hover {
+  text-decoration: underline;
 }
 
 .footer-admin {

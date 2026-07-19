@@ -8,17 +8,15 @@ const NAV_LINKS = STATIC_MODE
   ? [
       { label: 'Home', to: '/' },
       { label: 'About', to: '/about' },
-      { label: 'Branches', to: '/branches' },
+      { label: 'Yakap Clinics', to: '/branches' },
       { label: 'Pharmacy', to: '/pharmacy' },
-      { label: 'Contact', to: '/#contact' },
     ]
   : [
       { label: 'Home', to: '/' },
       { label: 'About', to: '/about' },
-      { label: 'Branches', to: '/branches' },
+      { label: 'Yakap Clinics', to: '/branches' },
       { label: 'Pharmacy', to: '/pharmacy' },
       { label: 'Track', to: '/track' },
-      { label: 'Contact', to: '/#contact' },
     ]
 
 export default function Navbar() {
@@ -30,10 +28,7 @@ export default function Navbar() {
       <div className="navbar-inner">
         <Link to="/" className="brand" onClick={() => setMenuOpen(false)}>
           <img src="/box-type-logo.png" alt="" className="brand-logo" />
-          <span className="brand-text">
-            <span className="brand-name">Life Saver</span>
-            <span className="brand-sub">Care Circle Inc.</span>
-          </span>
+          <span className="brand-name">Life Saver</span>
         </Link>
 
         <button

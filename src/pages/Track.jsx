@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { api, peso } from '../api.js'
-import PageHeader from '../components/PageHeader.jsx'
+import Pager from '../components/Pager.jsx'
+import FooterPage from '../components/FooterPage.jsx'
 
 const STATUS_LABELS = {
   confirmed: 'Confirmed',
@@ -32,13 +33,14 @@ export default function Track() {
     }
   }
 
-  return (
-    <>
-      <PageHeader eyebrow="Reference lookup" title="Track Your Booking or Order">
+  const lookupPage = (
+    <div className="hp-section track-page">
+      <span className="section-eyebrow">Reference lookup</span>
+      <h2>Track Your Booking or Order</h2>
+      <p className="section-sub">
         Enter the reference number you received — bookings start with <code>LS-BK</code>, pharmacy orders with{' '}
         <code>LS-OR</code>.
-      </PageHeader>
-    <section className="section page page-narrow section-tight">
+      </p>
       <form className="track-form" onSubmit={lookup}>
         <input
           required
@@ -92,7 +94,15 @@ export default function Track() {
           </div>
         </div>
       )}
-    </section>
-    </>
+    </div>
+  )
+
+  return (
+    <Pager
+      pages={[
+        { id: 'track', label: 'Track a Reference', scroll: true, content: lookupPage },
+        { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+      ]}
+    />
   )
 }

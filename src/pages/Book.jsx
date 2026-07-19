@@ -3,7 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api.js'
 import { branchBadges } from './Branches.jsx'
 import { CheckCircleIcon } from '../components/Icons.jsx'
-import PageHeader from '../components/PageHeader.jsx'
+import Pager from '../components/Pager.jsx'
+import FooterPage from '../components/FooterPage.jsx'
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
@@ -157,8 +158,8 @@ export default function Book() {
   }
 
   if (confirmation) {
-    return (
-      <section className="section page">
+    const confirmedPage = (
+      <div className="hp-section">
         <div className="confirm-card">
           <CheckCircleIcon size={52} className="confirm-icon" />
           <h2>Booking Confirmed!</h2>
@@ -176,16 +177,25 @@ export default function Book() {
             <Link to="/" className="btn btn-secondary">Back to Home</Link>
           </div>
         </div>
-      </section>
+      </div>
+    )
+    return (
+      <Pager
+        pages={[
+          { id: 'confirmed', label: 'Booking Confirmed', content: confirmedPage },
+          { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+        ]}
+      />
     )
   }
 
-  return (
-    <>
-      <PageHeader eyebrow="Appointments" title="Book an Appointment">
+  const wizardPage = (
+    <div className="hp-section book-page">
+      <span className="section-eyebrow">Appointments</span>
+      <h2>Book an Appointment</h2>
+      <p className="section-sub">
         Choose your preferred branch, service, and time — instant confirmation with a reference number.
-      </PageHeader>
-    <section className="section page section-tight">
+      </p>
       <div className="steps">
         {['Branch', 'Service', 'Date & Time', 'Your Details'].map((label, i) => (
           <span
@@ -351,7 +361,15 @@ export default function Book() {
           </form>
         </>
       )}
-    </section>
-    </>
+    </div>
+  )
+
+  return (
+    <Pager
+      pages={[
+        { id: 'book', label: 'Book an Appointment', scroll: true, content: wizardPage },
+        { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+      ]}
+    />
   )
 }

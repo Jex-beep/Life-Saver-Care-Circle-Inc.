@@ -1,129 +1,57 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { STATIC_MODE } from '../config.js'
 import { api } from '../api.js'
-import { MapPinIcon, PhoneIcon } from '../components/Icons.jsx'
-import PageHeader from '../components/PageHeader.jsx'
+import { BRANCHES } from '../data/branches.js'
+import Pager from '../components/Pager.jsx'
+import FooterPage from '../components/FooterPage.jsx'
+import BranchFinder from '../components/BranchFinder.jsx'
 
+/* kept for the booking wizard's branch cards */
 export function branchBadges(targetClient) {
   const badges = []
-  if (targetClient.includes('Yakap')) badges.push({ label: 'Yakap', cls: 'badge-yakap', title: 'PhilHealth-accredited Primary Care Facility' })
-  if (targetClient.includes('Gamot')) badges.push({ label: 'Gamot', cls: 'badge-gamot', title: 'PhilHealth members may avail of medicines here' })
-  if (targetClient.includes('Drug Store')) badges.push({ label: 'Pharmacy', cls: 'badge-gamot', title: 'Stand-alone drug store' })
+  if (targetClient.includes('Yakap'))
+    badges.push({ label: 'Yakap', cls: 'badge-yakap', title: 'PhilHealth-accredited Primary Care Facility' })
+  if (targetClient.includes('Gamot'))
+    badges.push({ label: 'Gamot', cls: 'badge-gamot', title: 'PhilHealth members may avail of medicines here' })
+  if (targetClient.includes('Drug Store'))
+    badges.push({ label: 'Pharmacy', cls: 'badge-gamot', title: 'Stand-alone drug store' })
   return badges
 }
 
 export default function Branches() {
-  const [branches, setBranches] = useState([])
+  const [branches, setBranches] = useState(STATIC_MODE ? BRANCHES : [])
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [area, setArea] = useState('All')
-  const [province, setProvince] = useState('All')
-  const [search, setSearch] = useState('')
 
   useEffect(() => {
-    api
-      .get('/branches')
-      .then(setBranches)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
+    if (STATIC_MODE) return
+    api.get('/branches').then(setBranches).catch((e) => setError(e.message))
   }, [])
 
-  const areas = useMemo(() => ['All', ...new Set(branches.map((b) => b.area))], [branches])
-  const provinces = useMemo(
-    () => ['All', ...new Set(branches.filter((b) => area === 'All' || b.area === area).map((b) => b.province))],
-    [branches, area]
-  )
+  const yakap = branches.filter((b) => b.target_client.includes('Yakap'))
 
-  const filtered = branches.filter(
-    (b) =>
-      (area === 'All' || b.area === area) &&
-      (province === 'All' || b.province === province) &&
-      (search === '' || `${b.name} ${b.city}`.toLowerCase().includes(search.toLowerCase()))
-  )
+  const pages = [
+    {
+      id: 'clinics',
+      label: 'Yakap Clinics',
+      scroll: true,
+      content: (
+        <div className="hp-section finder-section">
+          <span className="section-eyebrow">Our network</span>
+          <h2>Yakap Clinics</h2>
+          <p className="section-sub">
+            PhilHealth-accredited Primary Care Clinics. Press <strong>Use My Location</strong> or type your area,
+            and we'll show the clinic closest to you.
+          </p>
+          {error && <p className="error-box">{error}</p>}
+          {yakap.length > 0 && (
+            <BranchFinder branches={yakap} bookPath={STATIC_MODE ? null : '/book'} />
+          )}
+          {!error && yakap.length === 0 && <p className="muted center">Loading clinics…</p>}
+        </div>
+      ),
+    },
+    { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+  ]
 
-  return (
-    <>
-      <PageHeader eyebrow="Our network" title="Find a Branch">
-        Find your nearest Life Saver clinic or pharmacy.{' '}
-        <span className="badge badge-yakap">Yakap</span> PhilHealth-accredited Primary Care ·{' '}
-        <span className="badge badge-gamot">Gamot</span> PhilHealth medicine partner
-      </PageHeader>
-    <section className="section page section-tight">
-      <div className="filter-card">
-        <label className="filter-field">
-          <span>Area</span>
-          <select value={area} onChange={(e) => { setArea(e.target.value); setProvince('All') }}>
-            {areas.map((a) => (
-              <option key={a}>{a}</option>
-            ))}
-          </select>
-        </label>
-        <label className="filter-field">
-          <span>Province</span>
-          <select value={province} onChange={(e) => setProvince(e.target.value)}>
-            {provinces.map((p) => (
-              <option key={p}>{p}</option>
-            ))}
-          </select>
-        </label>
-        <label className="filter-field grow">
-          <span>Search</span>
-          <input
-            type="search"
-            placeholder="Branch name or city…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </label>
-      </div>
-
-      {!loading && !error && (
-        <p className="result-count">
-          Showing <strong>{filtered.length}</strong> of {branches.length} branches
-        </p>
-      )}
-      {loading && <p className="muted center">Loading branches…</p>}
-      {error && <p className="error-box">{error}</p>}
-
-      <div className="branch-grid">
-        {filtered.map((b) => (
-          <div key={b.id} className="branch-card">
-            <div className="branch-badges">
-              {branchBadges(b.target_client).map((badge) => (
-                <span key={badge.label} className={`badge ${badge.cls}`} title={badge.title}>
-                  {badge.label}
-                </span>
-              ))}
-            </div>
-            <h3>{b.name}</h3>
-            <p className="branch-loc">
-              <MapPinIcon size={14} className="inline-icon" /> {b.city}, {b.province} · {b.area}
-            </p>
-            {b.address && <p className="branch-addr">{b.address}</p>}
-            {b.phone && (
-              <p className="branch-addr">
-                <PhoneIcon size={14} className="inline-icon" /> {b.phone}
-              </p>
-            )}
-            <div className="branch-actions">
-              {!b.target_client.includes('Drug Store') && (
-                <Link to={`/book?branch=${b.id}`} className="btn btn-primary btn-sm">
-                  Book Here
-                </Link>
-              )}
-              {(b.target_client.includes('Gamot') || b.target_client.includes('Drug Store')) && (
-                <Link to={`/pharmacy?branch=${b.id}`} className="btn btn-secondary btn-sm">
-                  Order Medicines
-                </Link>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-      {!loading && !error && filtered.length === 0 && (
-        <p className="muted center">No branches match those filters.</p>
-      )}
-    </section>
-    </>
-  )
+  return <Pager pages={pages} />
 }

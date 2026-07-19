@@ -7,7 +7,7 @@ export default function Footer() {
     <footer id="contact" className="footer">
       <div className="footer-inner">
         <div>
-          <img src="/rectangle-type-logo.png" alt="Life Saver Care Circle Inc." className="footer-logo" />
+          <img src="/rectangle-type-logo.png" alt="Life Saver" className="footer-logo" />
           <p>Caring for our community, one patient at a time.</p>
           <p className="footer-tags">
             <span className="badge badge-yakap">Yakap</span> PhilHealth-accredited Primary Care ·{' '}
@@ -61,7 +61,7 @@ export default function Footer() {
         </div>
       </div>
       <p className="footer-note">
-        © 2026 Life Saver Care Circle Inc. — Yakap: PhilHealth-accredited Primary Care Facility · Gamot: pharmacy
+        © 2026 Life Saver — Yakap: PhilHealth-accredited Primary Care Facility · Gamot: pharmacy
         where PhilHealth members may avail of medicines.
       </p>
     </footer>

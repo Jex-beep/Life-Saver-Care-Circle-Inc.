@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { STATIC_MODE } from '../config.js'
+import { api } from '../api.js'
 import Aurora from '../components/bits/Aurora.jsx'
 import BlurText from '../components/bits/BlurText.jsx'
 import CountUp from '../components/bits/CountUp.jsx'
-import { HeartPulseIcon, BeakerIcon, SyringeIcon, FileTextIcon, CheckIcon, MegaphoneIcon } from '../components/Icons.jsx'
-import { api } from '../api.js'
+import Pager from '../components/Pager.jsx'
+import FooterPage from '../components/FooterPage.jsx'
+import {
+  HeartPulseIcon,
+  BeakerIcon,
+  SyringeIcon,
+  FileTextIcon,
+  CheckIcon,
+  MegaphoneIcon,
+} from '../components/Icons.jsx'
 
 const SERVICES = [
   {
@@ -36,40 +45,13 @@ const FACILITIES = [
   { src: '/ls-stock-image.jpg', caption: 'Mobile clinics bringing care to your barangay' },
 ]
 
-// Images cycled in the hero photo card
-const HERO_IMAGES = [
-  '/ls-stock-image2.jpg',
-  '/dentist-office.jpg',
-  '/ls-injection.jpg',
-]
-
-// Images cycled behind the whole hero section (swap these for whichever background shots you want)
-const HERO_BG_IMAGES = [
-  '/ls-hero-image.jpg',
-  '/ls-givingmedicine.jpg',
-  '/ls-injection.jpg',
-]
+const HERO_BG_IMAGES = ['/ls-hero-image.jpg', '/ls-givingmedicine.jpg', '/ls-injection.jpg']
 
 const CATEGORY_LABELS = { news: 'News', hiring: "We're Hiring", advisory: 'Advisory' }
 
-export default function Home() {
-  const location = useLocation()
+function HeroPage() {
   const [bgIndex, setBgIndex] = useState(0)
   const [prevBgIndex, setPrevBgIndex] = useState(0)
-  const [announcements, setAnnouncements] = useState([])
-
-  useEffect(() => {
-    if (STATIC_MODE) return
-    api.get('/announcements?limit=4').then(setAnnouncements).catch(() => {})
-  }, [])
-
-  useEffect(() => {
-    if (location.hash) {
-      document.querySelector(location.hash)?.scrollIntoView({ behavior: 'smooth' })
-    } else {
-      window.scrollTo(0, 0)
-    }
-  }, [location])
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -79,236 +61,169 @@ export default function Home() {
   }, [])
 
   return (
-    <>
-      <section id="home" className="hero-wrap">
-        <img
-          className="hero-bg-layer hero-bg-back"
-          src={HERO_BG_IMAGES[prevBgIndex]}
-          alt=""
-          aria-hidden="true"
-        />
-        <img
-          key={bgIndex}
-          className="hero-bg-layer hero-bg-front"
-          src={HERO_BG_IMAGES[bgIndex]}
-          alt=""
-          aria-hidden="true"
-          onAnimationEnd={() => setPrevBgIndex(bgIndex)}
-        />
-        <div className="hero-aurora">
-          <Aurora colorStops={['#6c70d6', '#ff9a3d', '#e8384f']} amplitude={1.1} blend={0.55} speed={0.8} />
-        </div>
-        <div className="hero">
-          <div className="hero-content">
-            <p className="hero-eyebrow">Your health, our priority</p>
-            <h1 className="hero-heading">
-              <BlurText text="Quality Care for" delay={120} animateBy="words" className="hero-line" />
-              <BlurText
-                text="You & Your Family"
-                delay={120}
-                animateBy="words"
-                className="hero-line highlight"
-              />
-            </h1>
-            <p className="hero-text">
-              PhilHealth-accredited clinics and pharmacies across Luzon and Visayas. Book a visit at your
-              preferred branch or order your medicines online.
-            </p>
-            <div className="hero-actions">
-              {STATIC_MODE ? (
-                <>
-                  <Link to="/branches" className="btn btn-primary">
-                    Find a Branch
-                  </Link>
-                  <Link to="/pharmacy" className="btn btn-secondary">
-                    Our Pharmacies
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link to="/book" className="btn btn-primary">
-                    Book an Appointment
-                  </Link>
-                  <Link to="/pharmacy" className="btn btn-secondary">
-                    Order Medicines
-                  </Link>
-                </>
-              )}
-            </div>
-            <div className="hero-badges">
-              <span className="badge badge-yakap">Yakap</span> PhilHealth-accredited Primary Care
-              <span className="badge badge-gamot">Gamot</span> PhilHealth medicine partner
-            </div>
+    <div className="hero-wrap hp-hero">
+      <img className="hero-bg-layer hero-bg-back" src={HERO_BG_IMAGES[prevBgIndex]} alt="" aria-hidden="true" />
+      <img
+        key={bgIndex}
+        className="hero-bg-layer hero-bg-front"
+        src={HERO_BG_IMAGES[bgIndex]}
+        alt=""
+        aria-hidden="true"
+        onAnimationEnd={() => setPrevBgIndex(bgIndex)}
+      />
+      <div className="hero-aurora">
+        <Aurora colorStops={['#6c70d6', '#ff9a3d', '#e8384f']} amplitude={1.1} blend={0.55} speed={0.8} />
+      </div>
+      <div className="hero hp-hero-inner">
+        <div className="hero-content">
+          <p className="hero-eyebrow">Your health, our priority</p>
+          <h1 className="hero-heading">
+            <BlurText text="Quality Care for" delay={120} animateBy="words" className="hero-line" />
+            <BlurText text="You & Your Family" delay={120} animateBy="words" className="hero-line highlight" />
+          </h1>
+          <p className="hero-text">
+            PhilHealth-accredited clinics and pharmacies across Luzon and Visayas. Book a visit at your preferred
+            branch or order your medicines online.
+          </p>
+          <div className="hero-actions">
+            {STATIC_MODE ? (
+              <>
+                <Link to="/branches" className="btn btn-primary">Find a Yakap Clinic</Link>
+                <Link to="/pharmacy" className="btn btn-secondary">Our Pharmacies</Link>
+              </>
+            ) : (
+              <>
+                <Link to="/book" className="btn btn-primary">Book an Appointment</Link>
+                <Link to="/pharmacy" className="btn btn-secondary">Order Medicines</Link>
+              </>
+            )}
           </div>
-          <div className="hero-visual">
-            <div className="hero-photo-card">
-              <img
-                src={HERO_IMAGES[0]}
-                alt="Life Saver PhilHealth Yakap Primary Care Clinic"
-              />
-              <div className="hero-photo-caption">
-                <p className="hero-card-title">
-                  <CountUp to={13} duration={1.5} />+ Branches
-                </p>
-                <p className="hero-card-sub">NCR · Rizal · Southern Luzon · Visayas</p>
-                <Link to="/branches" className="hero-card-link">
-                  Find the branch nearest you →
-                </Link>
-              </div>
-            </div>
+          <div className="hero-badges">
+            <span className="badge badge-yakap">Yakap</span> PhilHealth-accredited Primary Care
+            <span className="badge badge-gamot">Gamot</span> PhilHealth medicine partner
           </div>
         </div>
-      </section>
-
-      <section id="services" className="section">
-        <span className="section-eyebrow">What we offer</span>
-        <h2>Our Services</h2>
-        <p className="section-sub">A full range of medical services under one roof — same list at every clinic.</p>
-        <div className="services-grid">
-          {SERVICES.map(({ Icon, title, description }) => (
-            <div key={title} className="service-card">
-              <span className="service-icon">
-                <Icon size={28} />
-              </span>
-              <h3>{title}</h3>
-              <p>{description}</p>
-            </div>
-          ))}
-        </div>
-        <p className="section-cta">
-          {STATIC_MODE ? (
-            <Link to="/branches" className="btn btn-primary">
-              Visit a Branch
-            </Link>
-          ) : (
-            <Link to="/book" className="btn btn-primary">
-              Book a Service
-            </Link>
-          )}
-        </p>
-      </section>
-
-      <section className="section facilities">
-        <span className="section-eyebrow">Our facilities</span>
-        <h2>Inside Our Clinics</h2>
-        <p className="section-sub">Clean, modern facilities — from our clinics to our mobile health units.</p>
-        <div className="facilities-grid">
-          {FACILITIES.map((f) => (
-            <figure key={f.src} className="facility-card">
-              <img src={f.src} alt={f.caption} loading="lazy" />
-              <figcaption>{f.caption}</figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
-
-      {announcements.length > 0 && (
-        <section id="news" className="section">
-          <span className="section-eyebrow">What's new</span>
-          <h2>News &amp; Announcements</h2>
-          <p className="section-sub">Updates, advisories, and openings from Life Saver Care Circle.</p>
-          <div className="ann-grid">
-            {announcements.map((a) => (
-              <article key={a.id} className="ann-card">
-                <div className="ann-card-head">
-                  <span className={`ann-chip ann-${a.category}`}>
-                    <MegaphoneIcon size={13} /> {CATEGORY_LABELS[a.category] || 'News'}
-                  </span>
-                  <time dateTime={a.published_at}>
-                    {new Date(a.published_at).toLocaleDateString('en-PH', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </time>
-                </div>
-                <h3>{a.title}</h3>
-                {a.body && <p className="ann-body">{a.body}</p>}
-              </article>
-            ))}
+        <div className="hp-hero-stats">
+          <div className="stat">
+            <span className="stat-number"><CountUp to={20} duration={2} />+</span>
+            <span className="stat-label">Years of Service</span>
           </div>
-        </section>
-      )}
-
-      <section id="about" className="section section-alt">
-        <div className="about-inner">
-          <div className="about-text">
-            <span className="section-eyebrow">Who we are</span>
-            <h2>About Us</h2>
-            <p>
-              For over 20 years, Life Saver Care Circle has served our community with compassionate,
-              patient-centered care. Our clinics are <strong>Yakap</strong> facilities — PhilHealth-accredited
-              Primary Care — and our <strong>Gamot</strong> partner pharmacies let PhilHealth members avail of
-              their medicines.
-            </p>
-            <ul className="about-list">
-              <li><CheckIcon size={18} className="list-check" /> PhilHealth-accredited primary care clinics</li>
-              <li><CheckIcon size={18} className="list-check" /> Gamot partner pharmacies</li>
-              <li><CheckIcon size={18} className="list-check" /> Corporate-managed branches, one standard of care</li>
-            </ul>
-            <div className="about-stats">
-              <div className="stat">
-                <span className="stat-number">
-                  <CountUp to={20} duration={2} />+
-                </span>
-                <span className="stat-label">Years of Service</span>
-              </div>
-              <div className="stat">
-                <span className="stat-number">
-                  <CountUp to={13} duration={2} />+
-                </span>
-                <span className="stat-label">Branches</span>
-              </div>
-              <div className="stat">
-                <span className="stat-number">
-                  <CountUp to={15} duration={2} />k
-                </span>
-                <span className="stat-label">Patients Served</span>
-              </div>
-            </div>
+          <div className="stat">
+            <span className="stat-number"><CountUp to={13} duration={2} />+</span>
+            <span className="stat-label">Branches</span>
           </div>
-          <div className="about-photos">
-            <img src="/ls-stalls.jpg" alt="Life Saver community health outreach booth" loading="lazy" />
-            <img
-              src="/people-gathering.jpg"
-              alt="Community members gathered at a Life Saver health event"
-              loading="lazy"
-            />
+          <div className="stat">
+            <span className="stat-number"><CountUp to={15} duration={2} />k</span>
+            <span className="stat-label">Patients Served</span>
           </div>
         </div>
-      </section>
-
-      <section id="bookings" className="section booking-banner">
-        <div className="booking-banner-content">
-          {STATIC_MODE ? (
-            <>
-              <h2>Visit Your Nearest Branch Today</h2>
-              <p>Walk-ins are welcome at all our Yakap clinics — Monday to Saturday, 8:00 AM to 5:00 PM.</p>
-              <div className="hero-actions" style={{ justifyContent: 'center' }}>
-                <Link to="/branches" className="btn btn-light">
-                  Find a Branch
-                </Link>
-                <Link to="/about" className="btn btn-outline-light">
-                  Learn About Us
-                </Link>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2>Ready to Book a Visit?</h2>
-              <p>Pick your preferred branch, choose a time slot, and get instant confirmation with a reference number.</p>
-              <div className="hero-actions" style={{ justifyContent: 'center' }}>
-                <Link to="/book" className="btn btn-light">
-                  Book an Appointment
-                </Link>
-                <Link to="/track" className="btn btn-outline-light">
-                  Track a Booking
-                </Link>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-    </>
+      </div>
+    </div>
   )
+}
+
+function ServicesPage() {
+  return (
+    <div className="hp-section">
+      <span className="section-eyebrow">What we offer</span>
+      <h2>Our Services</h2>
+      <p className="section-sub">A full range of medical services under one roof — same list at every clinic.</p>
+      <div className="services-grid hp-services">
+        {SERVICES.map(({ Icon, title, description }) => (
+          <div key={title} className="service-card">
+            <span className="service-icon"><Icon size={30} /></span>
+            <h3>{title}</h3>
+            <p>{description}</p>
+          </div>
+        ))}
+      </div>
+      <p className="section-cta">
+        {STATIC_MODE ? (
+          <Link to="/branches" className="btn btn-primary">Visit a Yakap Clinic</Link>
+        ) : (
+          <Link to="/book" className="btn btn-primary">Book a Service</Link>
+        )}
+      </p>
+    </div>
+  )
+}
+
+function AboutPage() {
+  return (
+    <div className="hp-section">
+      <div className="about-inner hp-about">
+        <div className="about-text">
+          <span className="section-eyebrow">Who we are</span>
+          <h2>About Us</h2>
+          <ul className="about-list">
+            <li><CheckIcon size={20} className="list-check" /> PhilHealth-accredited primary care clinics</li>
+            <li><CheckIcon size={20} className="list-check" /> Gamot partner pharmacies</li>
+            <li><CheckIcon size={20} className="list-check" /> Corporate-managed branches, one standard of care</li>
+          </ul>
+          <p className="section-cta" style={{ textAlign: 'left' }}>
+            <Link to="/about" className="btn btn-secondary">Read Our Full Story</Link>
+          </p>
+        </div>
+        <div className="about-photos">
+          <img src="/ls-stalls.jpg" alt="Life Saver community health outreach booth" loading="lazy" />
+          <img src="/people-gathering.jpg" alt="Community members gathered at a Life Saver health event" loading="lazy" />
+        </div>
+      </div>
+      <div className="facilities-grid hp-facilities">
+        {FACILITIES.map((f) => (
+          <figure key={f.src} className="facility-card">
+            <img src={f.src} alt={f.caption} loading="lazy" />
+            <figcaption>{f.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function NewsPage({ announcements }) {
+  return (
+    <div className="hp-section">
+      <span className="section-eyebrow">What's new</span>
+      <h2>News &amp; Announcements</h2>
+      <p className="section-sub">Updates, advisories, and openings from Life Saver.</p>
+      <div className="ann-grid">
+        {announcements.map((a) => (
+          <article key={a.id} className="ann-card">
+            <div className="ann-card-head">
+              <span className={`ann-chip ann-${a.category}`}>
+                <MegaphoneIcon size={13} /> {CATEGORY_LABELS[a.category] || 'News'}
+              </span>
+              <time dateTime={a.published_at}>
+                {new Date(a.published_at).toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' })}
+              </time>
+            </div>
+            <h3>{a.title}</h3>
+            {a.body && <p className="ann-body">{a.body}</p>}
+          </article>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function Home() {
+  const [announcements, setAnnouncements] = useState([])
+
+  useEffect(() => {
+    if (STATIC_MODE) return
+    api.get('/announcements?limit=4').then(setAnnouncements).catch(() => {})
+  }, [])
+
+  const pages = [
+    { id: 'welcome', label: 'Welcome', content: <HeroPage /> },
+    { id: 'services', label: 'Our Services', content: <ServicesPage /> },
+    { id: 'about', label: 'About Us', content: <AboutPage /> },
+    ...(announcements.length > 0
+      ? [{ id: 'news', label: 'News & Announcements', content: <NewsPage announcements={announcements} /> }]
+      : []),
+    { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+  ]
+
+  return <Pager pages={pages} />
 }

@@ -25,7 +25,7 @@ export default function AdminLogin() {
   return (
     <div className="admin-login-wrap">
       <form className="admin-login" onSubmit={submit}>
-        <img src="/rectangle-type-logo.png" alt="Life Saver Care Circle Inc." className="admin-logo center-logo" />
+        <img src="/rectangle-type-logo.png" alt="Life Saver" className="admin-logo center-logo" />
         <h2>Branch Login</h2>
         {error && <p className="error-box">{error}</p>}
         <label>

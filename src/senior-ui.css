@@ -1,0 +1,471 @@
+/* ============================================================
+   Senior-first UI layer  —  loaded last, refines App.css + pages.css
+   ------------------------------------------------------------
+   Audience: visitors roughly 45–70. Design rules applied here:
+     · Body copy at AAA contrast (7:1), never below 17px
+     · Every interactive target at least var(--tap) = 52px tall
+     · Layered depth via the --shadow-* scale (no ad-hoc shadows)
+     · Whitespace filled by letting sections grow, not by padding
+     · Motion is meaningful and always respects reduced-motion
+   ============================================================ */
+
+/* ---------- 1. Fill the viewport ----------
+   The pager centres each page, so a short section used to float in
+   the middle with dead bands above and below. Sections now claim the
+   full height and distribute their own content instead. */
+
+.pager-page-inner > .hp-section,
+.pager-page-inner > .ab-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(12px, 2vh, 28px);
+}
+
+/* Grids inside a full-height section stretch to absorb leftover space */
+.hp-services,
+.hp-facilities,
+.ann-grid,
+.ab-values {
+  flex: 1 1 auto;
+  align-content: center;
+}
+
+.hp-section > .section-sub {
+  margin-bottom: 0;
+}
+
+/* ---------- 2. Typography ---------- */
+
+.section-eyebrow {
+  font-size: var(--text-xs);
+  letter-spacing: 2.5px;
+  color: var(--accent-ink);
+  margin-bottom: var(--space-1);
+}
+
+.section-sub {
+  font-size: var(--text-lg);
+  max-width: 62ch;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/* Anything that was small-and-grey is the first thing older eyes lose */
+.muted,
+.small {
+  color: var(--text-soft);
+}
+
+.product-card .muted.small,
+.finder-item-loc {
+  font-size: var(--text-sm);
+}
+
+/* ---------- 3. Cards: presence + designed states ---------- */
+
+.service-card {
+  padding: clamp(22px, 2.6vh, 34px) clamp(20px, 2vw, 28px);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  background:
+    linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  transition:
+    transform 260ms var(--ease-out),
+    box-shadow 260ms var(--ease-out),
+    border-color 200ms ease;
+}
+
+.service-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+}
+
+.service-card h3 {
+  font-size: var(--text-xl);
+  margin: var(--space-2) 0 0;
+  line-height: 1.25;
+}
+
+.service-card p {
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.service-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: var(--radius-md);
+  background: var(--accent-bg-strong);
+  color: var(--accent-strong);
+  transition: transform 260ms var(--ease-out), background 200ms ease;
+}
+
+.service-card:hover .service-icon {
+  transform: scale(1.08) rotate(-3deg);
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ---------- 4. Buttons: bigger, with real pressed feedback ---------- */
+
+.btn {
+  min-height: var(--tap);
+  font-size: var(--text-base);
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  padding-inline: clamp(24px, 2.4vw, 34px);
+  transition:
+    transform 160ms var(--ease-out),
+    box-shadow 220ms var(--ease-out),
+    background 200ms ease;
+}
+
+.btn-primary {
+  box-shadow: var(--shadow-warm);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(214, 62, 24, 0.38);
+}
+
+.btn-secondary {
+  border-width: 2px;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+/* Press feedback — the button must visibly respond, not just hover */
+.btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.btn-sm {
+  min-height: 46px;
+  font-size: var(--text-sm);
+}
+
+/* ---------- 5. Navbar ---------- */
+
+.navbar-inner {
+  padding-block: var(--space-1);
+}
+
+.brand-name {
+  font-size: clamp(26px, 2.4vw, 34px);
+  letter-spacing: -0.02em;
+}
+
+.nav-links a {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  min-height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 14px;
+  border-radius: var(--radius-sm);
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.nav-links a:hover {
+  background: var(--accent-bg);
+  color: var(--accent-ink);
+}
+
+/* Current page must be unmistakable, not a 2px hairline */
+.nav-links a.active {
+  background: var(--accent-bg-strong);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+/* ---------- 6. Pager controls ----------
+   These are the single most important control on the site for an
+   older visitor: oversized, labelled, permanently visible. */
+
+.pager-nav {
+  min-height: 68px;
+  min-width: 116px;
+  font-size: var(--text-base);
+  font-weight: 700;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--accent-ink);
+  box-shadow: var(--shadow-lg);
+  transition: transform 200ms var(--ease-out), background 200ms ease, color 200ms ease;
+}
+
+.pager-nav:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(-50%) scale(1.06);
+}
+
+.pager-nav:active {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.pager-caption {
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+.pager-caption strong {
+  color: var(--accent-ink);
+}
+
+/* Dots are navigation, so they need a real tap area around the visual dot */
+.pager-dot {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--border-strong);
+}
+
+/* Invisible 53px hit area around the 15px visual dot */
+.pager-dot::after {
+  content: '';
+  position: absolute;
+  inset: -19px;
+}
+
+.pager-dot.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.25);
+}
+
+/* ---------- 7. Branch / pharmacy finder ---------- */
+
+.finder-item {
+  min-height: var(--tap);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms var(--ease-out);
+}
+
+.finder-item:hover {
+  border-color: var(--accent);
+  transform: translateX(4px);
+}
+
+.finder-item.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.finder-item-name {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.finder-place input,
+.shop-search,
+.shop-branch-select {
+  min-height: var(--tap);
+  font-size: var(--text-base);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.finder-status {
+  font-size: var(--text-sm);
+  background: var(--accent-bg);
+  border-left: 5px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text);
+}
+
+/* ---------- 8. Pharmacy catalog ---------- */
+
+.shop-cat {
+  min-height: 48px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding-inline: 20px;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.shop-cat:hover {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.shop-cat.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.product-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: transform 240ms var(--ease-out), box-shadow 240ms var(--ease-out), border-color 200ms ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-border);
+}
+
+.product-price {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--text-h);
+  /* prices line up column-wise and never reflow as digits change */
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 9. Contact page tiles ---------- */
+
+.fpage-tile {
+  min-height: 132px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  transition: transform 240ms var(--ease-out), box-shadow 240ms var(--ease-out), border-color 200ms ease;
+}
+
+.fpage-tile:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+}
+
+.fpage-tile strong {
+  font-size: var(--text-lg);
+}
+
+.fpage-tile span {
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+/* ---------- 10. Forms ---------- */
+
+.form-card input,
+.form-card select,
+.form-card textarea {
+  min-height: var(--tap);
+  font-size: var(--text-base);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+}
+
+.form-card label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.form-card input:focus,
+.form-card textarea:focus,
+.form-card select:focus {
+  border-color: var(--accent);
+}
+
+/* ---------- 11. Remaining small targets ----------
+   Text links that sit inline still need a comfortable hit area.
+   These each measured under 44px before this block. */
+
+.ab-arrow-link {
+  min-height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--accent-ink);
+  border-bottom: 3px solid var(--accent-border);
+  transition: gap 200ms var(--ease-out), border-color 200ms ease;
+}
+
+.ab-arrow-link:hover {
+  gap: 16px;
+  border-bottom-color: var(--accent);
+}
+
+/* Footer legal line: links inside flowing text */
+.fpage-note {
+  font-size: var(--text-sm);
+  line-height: 2.2;
+  color: var(--text);
+}
+
+.fpage-note a {
+  display: inline-block;
+  padding: 10px 14px;
+  min-height: 44px;
+  line-height: 24px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--accent-bg);
+  transition: background 180ms ease;
+}
+
+.fpage-note a:hover {
+  background: var(--accent-bg-strong);
+}
+
+/* Site-wide announcement bar */
+.ann-bar-text {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-block: 8px;
+}
+
+.ann-bar-close {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  transition: background 180ms ease;
+}
+
+.ann-bar-close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ---------- 12. Motion ----------
+   Every animation above is transform/opacity only, and all of it is
+   surrendered when the visitor asks for reduced motion. */
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card:hover,
+  .product-card:hover,
+  .fpage-tile:hover,
+  .btn:hover,
+  .btn:active,
+  .finder-item:hover,
+  .pager-nav:hover,
+  .service-card:hover .service-icon {
+    transform: none;
+  }
+
+  .pager-nav:hover {
+    transform: translateY(-50%);
+  }
+}

@@ -4,18 +4,17 @@ import { STATIC_MODE } from './config.js'
 import { api } from './api.js'
 import { CartProvider } from './context/CartContext.jsx'
 import Navbar from './components/Navbar.jsx'
-import Footer from './components/Footer.jsx'
 import Home from './pages/Home.jsx'
 import About from './pages/About.jsx'
 import Branches from './pages/Branches.jsx'
 import Book from './pages/Book.jsx'
 import Pharmacy from './pages/Pharmacy.jsx'
 import Track from './pages/Track.jsx'
-import BranchesStatic from './pages/static/BranchesStatic.jsx'
 import PharmacyStatic from './pages/static/PharmacyStatic.jsx'
 import AdminRoutes from './pages/admin/AdminRoutes.jsx'
 import './App.css'
 import './pages.css'
+import './senior-ui.css'
 
 /* Site-wide bar for the announcement the superadmin pinned (one at a time) */
 function AnnouncementBar() {
@@ -53,14 +52,13 @@ function AnnouncementBar() {
 
 function PublicLayout() {
   return (
-    <>
+    <div className="pub-shell">
       <AnnouncementBar />
       <Navbar />
       <main>
         <Outlet />
       </main>
-      <Footer />
-    </>
+    </div>
   )
 }
 
@@ -72,7 +70,7 @@ function StaticApp() {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/branches" element={<BranchesStatic />} />
+        <Route path="/branches" element={<Branches />} />
         <Route path="/pharmacy" element={<PharmacyStatic />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

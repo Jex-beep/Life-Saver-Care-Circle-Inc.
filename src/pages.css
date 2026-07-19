@@ -1,4 +1,597 @@
-﻿/* ---------- Hero with photo + Aurora background ---------- */
+﻿/* ============================================================
+   Paged full-viewport layout (no document scrolling)
+   Built for older visitors: huge labeled Next/Back controls,
+   page dots with captions, generous type and touch targets.
+   ============================================================ */
+
+.pub-shell {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pub-shell > main {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pager {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pager-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.45s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pager-track {
+    transition: none;
+  }
+}
+
+.pager-page {
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.pager-page-inner {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px clamp(16px, 7vw, 110px) 64px;
+}
+
+.pager-page-scroll .pager-page-inner {
+  overflow-y: auto;
+  justify-content: flex-start;
+  padding-top: 28px;
+}
+
+/* Big, obvious edge navigation */
+
+.pager-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--heading);
+  font-size: 17px;
+  font-weight: 700;
+  padding: 16px 20px;
+  border-radius: 999px;
+  border: 2px solid var(--accent-border);
+  background: var(--surface);
+  color: var(--accent-strong);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition), transform var(--transition);
+}
+
+.pager-nav:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}
+
+.pager-prev {
+  left: 18px;
+}
+
+.pager-next {
+  right: 18px;
+  animation: pagerNudge 2.4s ease-in-out infinite;
+}
+
+@keyframes pagerNudge {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-50%) translateX(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pager-next {
+    animation: none;
+  }
+}
+
+/* Progress dots + caption */
+
+.pager-progress {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.pager-dot {
+  pointer-events: auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: background-color var(--transition), transform var(--transition);
+}
+
+.pager-dot.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.2);
+}
+
+.pager-caption {
+  margin-left: 10px;
+  font-size: 14px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 16px;
+}
+
+.pager-caption strong {
+  color: var(--accent-strong);
+}
+
+/* Generic full-page section */
+
+.hp-section {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.hp-section > h2,
+.hp-section > .section-eyebrow,
+.hp-section > .section-sub {
+  text-align: center;
+}
+
+.hp-section .section-sub {
+  margin-bottom: 28px;
+}
+
+/* Home hero page */
+
+.hp-hero {
+  align-self: stretch;
+  flex: 1;
+  margin: -20px calc(-1 * clamp(16px, 7vw, 110px)) -64px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.hp-hero-inner {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 24px clamp(24px, 8vw, 120px) 56px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.hp-hero-stats {
+  display: grid;
+  gap: 14px;
+}
+
+.hp-services {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.hp-about {
+  gap: 40px;
+  margin-bottom: 24px;
+}
+
+.hp-about .about-photos img {
+  height: 150px;
+}
+
+.hp-facilities {
+  max-width: 1080px;
+  margin: 20px auto 0;
+}
+
+.hp-facilities .facility-card img {
+  height: 140px;
+}
+
+/* Finder (clinics & pharmacy locations) */
+
+.finder-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.finder {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 20px;
+  text-align: left;
+}
+
+.finder-list-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.finder-locate {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.finder-locate-btn {
+  gap: 8px;
+}
+
+.finder-place {
+  display: flex;
+  gap: 8px;
+}
+
+.finder-place input {
+  flex: 1;
+  font: inherit;
+  min-height: 48px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+}
+
+.finder-place input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.finder-status {
+  font-size: 14.5px;
+  color: var(--accent-strong);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.finder-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.finder-item {
+  font: inherit;
+  text-align: left;
+  padding: 13px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.finder-item:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.finder-item.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.finder-item-name {
+  display: block;
+  font-weight: 700;
+  color: var(--text-h);
+  font-size: 15.5px;
+}
+
+.finder-item-loc {
+  display: block;
+  font-size: 13.5px;
+  color: var(--text);
+}
+
+.finder-item-loc em {
+  font-style: normal;
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.finder-map-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.finder-map-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.finder-map-head h3 {
+  font-size: 16.5px;
+  margin: 0 0 2px;
+}
+
+.finder-map-head p {
+  font-size: 13.5px;
+}
+
+.finder-map-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.finder-map-link {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.finder-map {
+  flex: 1;
+  width: 100%;
+  min-height: 260px;
+  border: none;
+}
+
+/* Shop (pharmacy catalog) */
+
+.shop-page {
+  text-align: left;
+}
+
+.shop-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 4px 0 14px;
+}
+
+.shop-branch-select,
+.shop-search {
+  font: inherit;
+  min-height: 50px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+}
+
+.shop-branch-select {
+  flex: 1.2;
+  min-width: 260px;
+}
+
+.shop-search {
+  flex: 1;
+  min-width: 220px;
+}
+
+.shop-branch-select:focus,
+.shop-search:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.shop-cats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.shop-cat {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 20px;
+  min-height: 46px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.shop-cat:hover {
+  border-color: var(--accent-border);
+}
+
+.shop-cat.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.hp-products {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.shop-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.shop-pagination-label {
+  font-size: 14.5px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Contact / footer page */
+
+.fpage {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.fpage-sub {
+  max-width: 52ch;
+  margin: 0 auto 32px;
+}
+
+.fpage-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.fpage-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 26px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--accent);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), border-color var(--transition);
+}
+
+.fpage-tile:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-border);
+}
+
+.fpage-tile strong {
+  font-family: var(--heading);
+  font-size: 17px;
+  color: var(--text-h);
+}
+
+.fpage-tile span {
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.fpage-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.fpage-note {
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0.85;
+}
+
+.fpage-note a {
+  color: var(--accent);
+}
+
+/* Paged About adjustments */
+
+.ab-cover-paged {
+  align-self: stretch;
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  margin: -20px calc(-1 * clamp(16px, 7vw, 110px)) -64px;
+}
+
+.ab-cover-paged .ab-cover-text {
+  padding-bottom: 64px;
+}
+
+.ab-statbar-paged {
+  margin: 28px 0 0;
+  max-width: 900px;
+}
+
+.ab-section-paged {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.ab-section-paged .ab-head {
+  margin-bottom: 24px;
+}
+
+.ab-vision-paged {
+  align-self: stretch;
+  flex: 1;
+  margin: -20px calc(-1 * clamp(16px, 7vw, 110px)) -64px;
+  display: flex;
+  align-items: center;
+  padding: 24px clamp(24px, 8vw, 120px);
+}
+
+.ab-missions-paged .ab-mission {
+  padding: 14px 0;
+}
+
+.ab-missions-paged .ab-mission-num {
+  font-size: 28px;
+}
+
+/* ---------- Hero with photo + Aurora background ---------- */
 
 .hero-wrap {
   position: relative;

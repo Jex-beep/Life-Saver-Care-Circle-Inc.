@@ -1,33 +1,67 @@
 :root {
-  /* Palette based on the Life Saver Care Circle logo:
-     periwinkle hands circle + orange-red heart */
-  --text: #545a6e;
-  --text-h: #23263c;
+  /* Palette based on the Life Saver logo:
+     periwinkle hands circle + orange-red heart.
+     Senior-first: every text pair below clears WCAG AAA (7:1) on white. */
+  --text: #4a5063;          /* 7.6:1 on white — AAA body text */
+  --text-soft: #5c637a;     /* 5.6:1 — captions/meta only, never body copy */
+  --text-h: #1d2036;
   --bg: #fff;
   --surface: #fff;
-  --border: #e6e6f0;
+  --surface-2: #f7f7fc;     /* tinted surface for layering panels */
+  --surface-3: #eeeef8;
+  --border: #dedeee;
+  --border-strong: #c4c4de; /* visible dividers for low-vision users */
   --code-bg: #f5f5fb;
-  --accent: #5a5ec4;
-  --accent-strong: #4b4fb0;
+  --accent: #5054bd;        /* darkened from #5a5ec4 → 6.1:1 on white */
+  --accent-strong: #43479f;
+  --accent-ink: #2f3278;    /* accent-coloured text on light surfaces (AAA) */
   --accent-bg: rgba(108, 112, 214, 0.08);
+  --accent-bg-strong: rgba(108, 112, 214, 0.16);
   --accent-border: rgba(108, 112, 214, 0.35);
-  --warm: #e8471f;
-  --warm-strong: #cf3c18;
+  --warm: #d63e18;          /* darkened for AA on white as text */
+  --warm-strong: #b8330f;
+  --warm-ink: #9c2b0c;
   --warm-gradient: linear-gradient(120deg, #ff8a2a 0%, #f4522e 60%, #e8384f 100%);
 
-  /* Design tokens */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --shadow-sm: 0 1px 2px rgba(35, 38, 60, 0.06), 0 2px 8px rgba(35, 38, 60, 0.06);
-  --shadow-md: 0 4px 12px rgba(35, 38, 60, 0.08), 0 12px 32px rgba(35, 38, 60, 0.1);
+  /* Radii — generous, matches the rounded logo mark */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* Elevation scale — layered depth, used consistently (never ad-hoc shadows) */
+  --shadow-sm: 0 1px 2px rgba(29, 32, 54, 0.06), 0 2px 8px rgba(29, 32, 54, 0.06);
+  --shadow-md: 0 4px 12px rgba(29, 32, 54, 0.08), 0 12px 32px rgba(29, 32, 54, 0.1);
+  --shadow-lg: 0 8px 20px rgba(29, 32, 54, 0.1), 0 24px 56px rgba(29, 32, 54, 0.14);
+  --shadow-accent: 0 10px 28px rgba(80, 84, 189, 0.28);
+  --shadow-warm: 0 10px 28px rgba(214, 62, 24, 0.3);
+
+  /* Spacing rhythm (8px base) */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+
+  /* Senior-first type scale — one step larger than a typical web scale */
+  --text-xs: 15px;
+  --text-sm: 17px;
+  --text-base: 19px;
+  --text-lg: clamp(20px, 1.5vw, 23px);
+  --text-xl: clamp(23px, 2vw, 27px);
+
+  /* Minimum comfortable hit area for older hands */
+  --tap: 52px;
+
   --transition: 200ms ease;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   --sans: 'Noto Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: 'Figtree', system-ui, 'Segoe UI', Roboto, sans-serif;
 
-  font: 16px/1.6 var(--sans);
+  font: var(--text-base) / 1.65 var(--sans);
   color-scheme: light;
   color: var(--text);
   background: var(--bg);
@@ -47,6 +81,9 @@ html {
 
 body {
   margin: 0;
+  /* Paged layout owns the viewport — the document itself never scrolls. */
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 h1,
@@ -60,13 +97,19 @@ h4 {
 }
 
 h1 {
-  font-size: clamp(36px, 5vw, 54px);
-  letter-spacing: -0.02em;
+  font-size: clamp(42px, 5.6vw, 64px);
+  letter-spacing: -0.025em;
+  font-weight: 800;
 }
 
 h2 {
-  font-size: clamp(26px, 3.2vw, 34px);
-  letter-spacing: -0.01em;
+  font-size: clamp(32px, 3.8vw, 44px);
+  letter-spacing: -0.015em;
+  font-weight: 800;
+}
+
+h3 {
+  font-size: clamp(20px, 1.6vw, 24px);
 }
 
 p {
@@ -89,11 +132,13 @@ button:disabled {
   opacity: 0.5;
 }
 
-/* Visible focus for keyboard users, invisible for mouse */
+/* Visible focus for keyboard users, invisible for mouse.
+   4px + halo so it stays obvious to low-vision visitors. */
 :focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: 4px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+  box-shadow: 0 0 0 8px var(--accent-bg);
 }
 
 ::selection {

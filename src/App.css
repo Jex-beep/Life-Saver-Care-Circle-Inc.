@@ -28,35 +28,20 @@
 }
 
 .brand-logo {
-  width: 40px;
-  height: 40px;
+  width: 84px;
+  height: 84px;
   object-fit: contain;
   flex-shrink: 0;
 }
 
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
-  text-align: left;
-}
-
 .brand-name {
   font-family: var(--heading);
-  font-size: 19px;
+  font-size: 26px;
   font-weight: 800;
   background: var(--warm-gradient);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-}
-
-.brand-sub {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 2.2px;
-  text-transform: uppercase;
-  color: var(--accent);
 }
 
 .nav-links {

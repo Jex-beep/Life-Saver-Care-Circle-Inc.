@@ -20,22 +20,34 @@ const SERVICES = [
   {
     Icon: HeartPulseIcon,
     title: 'General Consultation',
-    description: 'Comprehensive check-ups and health assessments with our experienced physicians.',
+    description: 'Everyday checkups, symptoms review, follow-ups, and family care planning.',
+    duration: '20–30 min',
+    image: '/ls-hero-image.jpg',
+    tags: ['Adult and pediatric concerns', 'Blood pressure and vital signs', 'Follow-up advice and referrals'],
   },
   {
     Icon: BeakerIcon,
     title: 'Laboratory Services',
-    description: 'Fast and accurate diagnostic testing, from blood work to specialized screenings.',
+    description: 'Reliable diagnostic testing for routine monitoring and physician requests.',
+    duration: '15–45 min',
+    image: '/ls-stock-image2.jpg',
+    tags: ['Blood work and screenings', 'Same-day results on select tests', 'Physician-requested panels'],
   },
   {
     Icon: SyringeIcon,
     title: 'Vaccination',
-    description: 'Routine immunizations and travel vaccines for patients of all ages.',
+    description: 'Routine and travel vaccine support for children, adults, and families.',
+    duration: '10–15 min',
+    image: '/ls-injection.jpg',
+    tags: ['Routine immunizations', 'Travel vaccines', 'All ages welcome'],
   },
   {
     Icon: FileTextIcon,
     title: 'Medical Certificates',
-    description: 'Fit-to-work and other medical certificates, processed the same day.',
+    description: 'Fit-to-work and other certificates processed after proper clinical assessment.',
+    duration: 'Same day',
+    image: '/ls-givingmedicine.jpg',
+    tags: ['Fit-to-work certificates', 'Pre-employment clearance', 'Processed same day'],
   },
 ]
 
@@ -51,29 +63,25 @@ const CATEGORY_LABELS = { news: 'News', hiring: "We're Hiring", advisory: 'Advis
 
 function HeroPage() {
   const [bgIndex, setBgIndex] = useState(0)
-  const [prevBgIndex, setPrevBgIndex] = useState(0)
 
   useEffect(() => {
     const id = setInterval(() => {
       setBgIndex((i) => (i + 1) % HERO_BG_IMAGES.length)
-    }, 10000)
+    }, 5000)
     return () => clearInterval(id)
   }, [])
 
   return (
     <div className="hero-wrap hp-hero">
-      <img className="hero-bg-layer hero-bg-back" src={HERO_BG_IMAGES[prevBgIndex]} alt="" aria-hidden="true" />
-      <img
-        key={bgIndex}
-        className="hero-bg-layer hero-bg-front"
-        src={HERO_BG_IMAGES[bgIndex]}
-        alt=""
-        aria-hidden="true"
-        onAnimationEnd={() => setPrevBgIndex(bgIndex)}
-      />
-      <div className="hero-aurora">
-        <Aurora colorStops={['#6c70d6', '#ff9a3d', '#e8384f']} amplitude={1.1} blend={0.55} speed={0.8} />
-      </div>
+      {HERO_BG_IMAGES.map((src, i) => (
+        <img
+          key={src}
+          className={`hero-bg-layer ${i === bgIndex ? 'is-active' : ''}`}
+          src={src}
+          alt=""
+          aria-hidden="true"
+        />
+      ))}
       <div className="hero hp-hero-inner">
         <div className="hero-content">
           <p className="hero-eyebrow">Your health, our priority</p>
@@ -103,79 +111,100 @@ function HeroPage() {
             <span className="badge badge-gamot">Gamot</span> PhilHealth medicine partner
           </div>
         </div>
-        <div className="hp-hero-stats">
-          <div className="stat">
-            <span className="stat-number"><CountUp to={20} duration={2} />+</span>
-            <span className="stat-label">Years of Service</span>
-          </div>
-          <div className="stat">
-            <span className="stat-number"><CountUp to={13} duration={2} />+</span>
-            <span className="stat-label">Branches</span>
-          </div>
-          <div className="stat">
-            <span className="stat-number"><CountUp to={15} duration={2} />k</span>
-            <span className="stat-label">Patients Served</span>
-          </div>
-        </div>
       </div>
     </div>
   )
 }
 
 function ServicesPage() {
+  const [selected, setSelected] = useState(0)
+  const service = SERVICES[selected]
+
   return (
-    <div className="hp-section">
-      <span className="section-eyebrow">What we offer</span>
-      <h2>Our Services</h2>
-      <p className="section-sub">A full range of medical services under one roof — same list at every clinic.</p>
-      <div className="services-grid hp-services">
-        {SERVICES.map(({ Icon, title, description }) => (
-          <div key={title} className="service-card">
-            <span className="service-icon"><Icon size={30} /></span>
-            <h3>{title}</h3>
-            <p>{description}</p>
-          </div>
-        ))}
+    <div className="hero-wrap svc-page-wrap">
+      <div className="hero-aurora">
+        <Aurora colorStops={['#6c70d6', '#ff9a3d', '#e8384f']} amplitude={1.1} blend={0.55} speed={0.8} />
       </div>
-      <p className="section-cta">
-        {STATIC_MODE ? (
-          <Link to="/branches" className="btn btn-primary">Visit a Yakap Clinic</Link>
-        ) : (
-          <Link to="/book" className="btn btn-primary">Book a Service</Link>
-        )}
-      </p>
+      <div className="hp-section svc-page-inner">
+        <span className="section-eyebrow">What we offer</span>
+        <div className="svc-layout">
+          <div className="svc-list">
+            {SERVICES.map((s, i) => (
+              <button
+                key={s.title}
+                type="button"
+                className={`svc-list-item ${i === selected ? 'is-active' : ''}`}
+                onClick={() => setSelected(i)}
+              >
+                <span className="svc-list-num">{String(i + 1).padStart(2, '0')}</span>
+                <h3>{s.title}</h3>
+                <p>{s.description}</p>
+              </button>
+            ))}
+          </div>
+
+          <div className="svc-showcase">
+            <div className="svc-showcase-media" style={{ backgroundImage: `url(${service.image})` }}>
+              <div className="svc-showcase-scrim" />
+              <div className="svc-showcase-content">
+                <span className="svc-showcase-duration">Typical visit: {service.duration}</span>
+                <h3>{service.title}</h3>
+                <p>{service.description}</p>
+                <div className="svc-showcase-tags">
+                  {service.tags.map((t) => (
+                    <span key={t} className="svc-tag">{t}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="svc-showcase-footer">
+              <p>Add real branch availability later, but keep this page focused on helping patients decide and book.</p>
+              {STATIC_MODE ? (
+                <Link to="/branches" className="btn btn-primary">Book this service</Link>
+              ) : (
+                <Link to="/book" className="btn btn-primary">Book this service</Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
 
 function AboutPage() {
   return (
-    <div className="hp-section">
-      <div className="about-inner hp-about">
-        <div className="about-text">
-          <span className="section-eyebrow">Who we are</span>
-          <h2>About Us</h2>
-          <ul className="about-list">
-            <li><CheckIcon size={20} className="list-check" /> PhilHealth-accredited primary care clinics</li>
-            <li><CheckIcon size={20} className="list-check" /> Gamot partner pharmacies</li>
-            <li><CheckIcon size={20} className="list-check" /> Corporate-managed branches, one standard of care</li>
-          </ul>
-          <p className="section-cta" style={{ textAlign: 'left' }}>
-            <Link to="/about" className="btn btn-secondary">Read Our Full Story</Link>
+    <div className="hp-section ab-home">
+      <div className="ab-home-intro">
+        <div className="ab-home-heading">
+          <span className="section-eyebrow ab-home-eyebrow">About Life Saver</span>
+          <h2 className="ab-home-title">A healthcare network built around everyday Filipino families.</h2>
+        </div>
+        <div className="ab-home-copy">
+          <p>
+            Life Saver brings together primary care clinics, Yakap assistance, and pharmacy
+            coordination so patients can move from concern to consultation to medicine support
+            with less confusion.
           </p>
         </div>
-        <div className="about-photos">
-          <img src="/ls-stalls.jpg" alt="Life Saver community health outreach booth" loading="lazy" />
-          <img src="/people-gathering.jpg" alt="Community members gathered at a Life Saver health event" loading="lazy" />
-        </div>
       </div>
-      <div className="facilities-grid hp-facilities">
-        {FACILITIES.map((f) => (
-          <figure key={f.src} className="facility-card">
-            <img src={f.src} alt={f.caption} loading="lazy" />
-            <figcaption>{f.caption}</figcaption>
-          </figure>
-        ))}
+
+      <div className="ab-home-mosaic">
+        <figure className="ab-home-mosaic-big">
+          <img src="/ls-stalls.jpg" alt="Life Saver medical team" loading="lazy" />
+          <figcaption>
+            <span className="ab-home-kicker">Our Promise</span>
+            <p>Care should feel organized, local, and human.</p>
+          </figcaption>
+        </figure>
+        <figure className="ab-home-mosaic-small">
+          <img src="/ls-givingmedicine.jpg" alt="Primary care consultation" loading="lazy" />
+          <figcaption>Primary care made easier to reach</figcaption>
+        </figure>
+        <figure className="ab-home-mosaic-small">
+          <img src="/dentist-office.jpg" alt="Clinic facilities and equipment" loading="lazy" />
+          <figcaption>Organized facilities and equipment</figcaption>
+        </figure>
       </div>
     </div>
   )
@@ -222,7 +251,7 @@ export default function Home() {
     ...(announcements.length > 0
       ? [{ id: 'news', label: 'News & Announcements', content: <NewsPage announcements={announcements} /> }]
       : []),
-    { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+    { id: 'contact', label: 'Contact Us', content: <FooterPage />, scroll: true },
   ]
 
   return <Pager pages={pages} />

@@ -6,12 +6,9 @@ import Pager from '../components/Pager.jsx'
 import FooterPage from '../components/FooterPage.jsx'
 import {
   HeartIcon,
-  MapPinIcon,
   ShieldCheckIcon,
   AwardIcon,
-  LightbulbIcon,
   UsersIcon,
-  HeartPulseIcon,
 } from '../components/Icons.jsx'
 
 const MISSION = [
@@ -25,13 +22,10 @@ const MISSION = [
 ]
 
 const VALUES = [
-  { Icon: HeartIcon, name: 'Compassion', text: 'We serve patients and communities with empathy, dignity, and genuine concern.' },
-  { Icon: MapPinIcon, name: 'Accessibility', text: 'We believe healthcare must be reachable, affordable, and available to Filipino families.' },
-  { Icon: ShieldCheckIcon, name: 'Integrity', text: 'We uphold ethical healthcare practices, transparency, accountability, and responsible stewardship of resources.' },
-  { Icon: AwardIcon, name: 'Excellence', text: 'We pursue high standards in service delivery, operations, compliance, and patient experience.' },
-  { Icon: LightbulbIcon, name: 'Innovation', text: 'We use technology, data, and new operating models to improve healthcare access and efficiency.' },
-  { Icon: UsersIcon, name: 'Collaboration', text: 'We work with government, communities, healthcare partners, and stakeholders to advance shared health goals.' },
-  { Icon: HeartPulseIcon, name: 'Prevention First', text: 'We promote primary care, early intervention, medicine adherence, and healthier communities.' },
+  { letter: 'L', Icon: UsersIcon, name: 'Leadership through Service', text: 'We lead by serving — putting patients and communities first in every decision, at every branch.' },
+  { letter: 'I', Icon: ShieldCheckIcon, name: 'Integrity and Accountability', text: 'We uphold ethical practice, transparency, and responsible stewardship — and we answer for our work.' },
+  { letter: 'F', Icon: HeartIcon, name: 'Faith, Compassion, and Respect', text: 'We care for every patient with empathy, dignity, and respect, regardless of social status.' },
+  { letter: 'E', Icon: AwardIcon, name: 'Excellence in Healthcare', text: 'We hold high standards in clinical care, patient safety, and experience across the network.' },
 ]
 
 function ChapterHead({ num, label, light = false }) {
@@ -134,11 +128,12 @@ function MissionPage() {
 function ValuesPage() {
   return (
     <div className="ab-section ab-section-paged">
-      <ChapterHead num="04" label="Core Values" />
+      <ChapterHead num="04" label="Core Values · L.I.F.E." />
       <div className="ab-values">
-        {VALUES.map(({ Icon, name, text }) => (
+        {VALUES.map(({ letter, Icon, name, text }) => (
           <div key={name} className="ab-value">
             <div className="ab-value-name">
+              <span className="ab-value-letter" aria-hidden="true">{letter}</span>
               <Icon size={20} />
               <h3>{name}</h3>
             </div>
@@ -190,7 +185,7 @@ export default function About() {
     { id: 'mission', label: 'Our Mission', content: <MissionPage />, scroll: true },
     { id: 'values', label: 'Core Values', content: <ValuesPage />, scroll: true },
     { id: 'field', label: 'In the Field', content: <FieldPage /> },
-    { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+    { id: 'contact', label: 'Contact Us', content: <FooterPage />, scroll: true },
   ]
   return <Pager pages={pages} />
 }

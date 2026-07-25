@@ -351,7 +351,7 @@ export default function Pharmacy() {
         </div>
       ),
     },
-    { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+    { id: 'contact', label: 'Contact Us', content: <FooterPage />, scroll: true },
   ]
 
   return <Pager pages={pages} />

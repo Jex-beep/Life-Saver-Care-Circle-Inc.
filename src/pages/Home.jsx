@@ -62,11 +62,13 @@ const HERO_BG_IMAGES = ['/ls-hero-image.jpg', '/ls-givingmedicine.jpg', '/ls-inj
 const CATEGORY_LABELS = { news: 'News', hiring: "We're Hiring", advisory: 'Advisory' }
 
 function HeroPage() {
-  const [bgIndex, setBgIndex] = useState(0)
+  // cur = image on top (fades in); prev = image kept opaque just beneath it.
+  // Single atomic state so React always renders a consistent pair (clean fade).
+  const [idx, setIdx] = useState({ cur: 0, prev: -1 })
 
   useEffect(() => {
     const id = setInterval(() => {
-      setBgIndex((i) => (i + 1) % HERO_BG_IMAGES.length)
+      setIdx((s) => ({ cur: (s.cur + 1) % HERO_BG_IMAGES.length, prev: s.cur }))
     }, 5000)
     return () => clearInterval(id)
   }, [])
@@ -76,7 +78,13 @@ function HeroPage() {
       {HERO_BG_IMAGES.map((src, i) => (
         <img
           key={src}
-          className={`hero-bg-layer ${i === bgIndex ? 'is-active' : ''}`}
+          className={`hero-bg-layer ${i === idx.cur ? 'is-active' : ''}`}
+          style={{
+            // active on top (fades in), previous stays opaque just beneath it,
+            // everything else transparent so the next fade starts cleanly from 0
+            opacity: i === idx.cur || i === idx.prev ? 1 : 0,
+            zIndex: i === idx.cur ? 2 : i === idx.prev ? 1 : 0,
+          }}
           src={src}
           alt=""
           aria-hidden="true"

@@ -6,15 +6,18 @@
 }
 
 .navbar {
-  position: absolute;          
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  background: color-mix(in srgb, var(--bg) 0%, transparent);
-  backdrop-filter: blur(10px) saturate(1.4);
-  -webkit-backdrop-filter: blur(10px) saturate(1.4);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+  /* semi-opaque frosted bar so the links/logo stay readable over ANY hero
+     photo (was fully transparent — blur alone adds no contrast) */
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.5);
+  -webkit-backdrop-filter: blur(14px) saturate(1.5);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  box-shadow: 0 6px 24px -14px rgba(20, 25, 45, 0.5);
 }
 
 .pub-shell {

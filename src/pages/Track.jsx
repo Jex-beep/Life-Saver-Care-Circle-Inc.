@@ -101,7 +101,7 @@ export default function Track() {
     <Pager
       pages={[
         { id: 'track', label: 'Track a Reference', scroll: true, content: lookupPage },
-        { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+        { id: 'contact', label: 'Contact Us', content: <FooterPage />, scroll: true },
       ]}
     />
   )

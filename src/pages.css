@@ -54,7 +54,8 @@
 .pager-page-scroll .pager-page-inner {
   overflow-y: auto;
   justify-content: flex-start;
-  padding-top: 28px;
+  /* clear the fixed navbar so scrolling form content doesn't start under it */
+  padding-top: calc(var(--navbar-h) + 28px);
 }
 
 /* Big, obvious edge navigation */
@@ -269,6 +270,52 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.finder-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.finder-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.finder-type-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted, #667);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.finder-type-select {
+  appearance: none;
+  padding: 9px 34px 9px 14px;
+  border: 1px solid var(--border, #d7dbe6);
+  border-radius: 10px;
+  background: #fff
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23667' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>")
+    no-repeat right 12px center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text, #1a1f2e);
+  cursor: pointer;
+}
+
+.finder-type-select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.finder-empty {
+  margin-top: 40px;
+  font-size: 16px;
 }
 
 .finder {
@@ -1110,6 +1157,21 @@
   align-items: center;
   gap: 10px;
   color: var(--accent);
+}
+
+.ab-value-letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .ab-value-name h3 {
@@ -2432,9 +2494,15 @@ code {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: 0;
+  /* Opacity + stacking order are driven inline (see HeroPage): the active layer
+     sits on top and the PREVIOUS layer stays fully opaque just beneath it, so
+     the incoming image fades in over an opaque image — only two images ever
+     blend and the base never bleeds through. Transition (not animation) so
+     React re-renders don't restart the fade. */
   opacity: 0;
-  transition: opacity 1.2s ease;
+  transition: opacity 0.5s ease;
+  /* crisp, vivid photo instead of a flat washed-out backdrop */
+  filter: contrast(1.08) saturate(1.16);
 }
 
 .hero-bg-front {
@@ -2455,13 +2523,30 @@ code {
   position: absolute;
   inset: 0;
   z-index: 1;
-  /* keep only a small legibility gradient on the left where the text sits */
+  /* light scrim for the Services page (text sits in cards there) */
   background: linear-gradient(
     100deg,
     rgba(255, 255, 255, 0.35) 0%,
     rgba(255, 255, 255, 0.15) 35%,
     rgba(255, 255, 255, 0) 60%
   );
+}
+
+/* Hero: no veil — the photo reads full-bleed and crisp like the Services page.
+   The heading stays readable inside its frosted glass panel (.hero-content). */
+.hp-hero::before {
+  content: none;
+}
+
+.hp-hero .hero-content {
+  /* clean solid text box (like a PowerPoint text box) — NO backdrop blur,
+     so the background photo stays razor-sharp everywhere */
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 22px;
+  padding: 34px 38px 36px;
+  box-shadow: 0 24px 60px -18px rgba(20, 25, 45, 0.35);
+  max-width: 640px;
 }
 
 .hero-aurora {
@@ -2477,9 +2562,7 @@ code {
   z-index: 3;
 }
 
-.hero-bg-layer.is-active {
-  opacity: 1;
-}
+/* Opacity for the active/previous layers is set inline in HeroPage. */
 
 
 /* ---------- Services (interactive showcase) ---------- */
@@ -3143,5 +3226,6 @@ code {
 .pager-page-scroll .pager-page-inner {
   overflow-y: auto;
   justify-content: flex-start;
-  padding-top: 28px;
+  /* clear the fixed navbar so scrolling form content doesn't start under it */
+  padding-top: calc(var(--navbar-h) + 28px);
 }

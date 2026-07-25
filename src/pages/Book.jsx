@@ -183,7 +183,7 @@ export default function Book() {
       <Pager
         pages={[
           { id: 'confirmed', label: 'Booking Confirmed', content: confirmedPage },
-          { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+          { id: 'contact', label: 'Contact Us', content: <FooterPage />, scroll: true },
         ]}
       />
     )
@@ -368,7 +368,7 @@ export default function Book() {
     <Pager
       pages={[
         { id: 'book', label: 'Book an Appointment', scroll: true, content: wizardPage },
-        { id: 'contact', label: 'Contact Us', content: <FooterPage /> },
+        { id: 'contact', label: 'Contact Us', content: <FooterPage />, scroll: true },
       ]}
     />
   )

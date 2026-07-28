@@ -8,14 +8,14 @@ const NAV_LINKS = STATIC_MODE
   ? [
       { label: 'Home', to: '/' },
       { label: 'About', to: '/about' },
-      { label: 'Yakap Clinics', to: '/branches' },
-      { label: 'Pharmacy', to: '/pharmacy' },
+      { label: 'Yakap', to: '/branches', cls: 'nav-yakap' },
+      { label: 'Gamot', to: '/pharmacy', cls: 'nav-gamot' },
     ]
   : [
       { label: 'Home', to: '/' },
       { label: 'About', to: '/about' },
-      { label: 'Yakap Clinics', to: '/branches' },
-      { label: 'Pharmacy', to: '/pharmacy' },
+      { label: 'Yakap', to: '/branches', cls: 'nav-yakap' },
+      { label: 'Gamot', to: '/pharmacy', cls: 'nav-gamot' },
       { label: 'Track', to: '/track' },
     ]
 
@@ -54,7 +54,7 @@ export default function Navbar() {
                 key={link.label}
                 to={link.to}
                 end={link.to === '/'}
-                className={({ isActive }) => (isActive ? 'active' : '')}
+                className={({ isActive }) => [link.cls, isActive ? 'active' : ''].filter(Boolean).join(' ')}
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}

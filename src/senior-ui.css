@@ -25,10 +25,17 @@
 
 /* Grids inside a full-height section stretch to absorb leftover space */
 .hp-services,
-.hp-facilities,
-.ann-grid,
-.ab-values {
+.hp-facilities {
   flex: 1 1 auto;
+  align-content: center;
+}
+
+/* Core Values reads better as a tight, centred cluster than a grid that
+   grows and then floats its two rows in the middle (which left a big gap
+   under the "04" chapter head). Keep it at natural height so the section's
+   own justify-content:center centres the head + cards together. */
+.ab-values {
+  flex: 0 0 auto;
   align-content: center;
 }
 

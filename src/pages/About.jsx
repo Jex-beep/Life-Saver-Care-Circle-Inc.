@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { STATIC_MODE } from '../config.js'
 import BlurText from '../components/bits/BlurText.jsx'
-import CountUp from '../components/bits/CountUp.jsx'
 import Pager from '../components/Pager.jsx'
 import FooterPage from '../components/FooterPage.jsx'
 import {
@@ -49,12 +48,6 @@ function CoverPage() {
           <BlurText text="Care that reaches" delay={110} animateBy="words" className="ab-title-line" />
           <BlurText text="every community." delay={110} animateBy="words" className="ab-title-line" />
         </h1>
-        <div className="ab-statbar ab-statbar-paged">
-          <div><strong><CountUp to={20} duration={2} />+</strong><span>Years of service</span></div>
-          <div><strong><CountUp to={13} duration={2} />+</strong><span>Branches nationwide</span></div>
-          <div><strong><CountUp to={15} duration={2} />k</strong><span>Patients served</span></div>
-          <div><strong>Yakap · Gamot</strong><span>PhilHealth programs</span></div>
-        </div>
       </div>
     </div>
   )

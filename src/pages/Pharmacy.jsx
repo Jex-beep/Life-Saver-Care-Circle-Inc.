@@ -6,6 +6,7 @@ import { PillIcon } from '../components/Icons.jsx'
 import Pager from '../components/Pager.jsx'
 import FooterPage from '../components/FooterPage.jsx'
 import BranchFinder from '../components/BranchFinder.jsx'
+import ComingSoon from '../components/ComingSoon.jsx'
 
 const PER_PAGE = 8
 
@@ -335,7 +336,18 @@ export default function Pharmacy() {
   }
 
   const pages = [
-    { id: 'shop', label: 'Order Medicines', scroll: true, content: shopContent },
+    {
+      id: 'shop',
+      label: 'Order Medicines',
+      scroll: true,
+      content: (
+        <ComingSoon
+          eyebrow="Gamot pharmacy"
+          title="Order Medicines"
+          note="Online medicine ordering from our Gamot partner pharmacies is coming soon. In the meantime, you can still find our pharmacy locations."
+        />
+      ),
+    },
     {
       id: 'locations',
       label: 'Pharmacy Locations',

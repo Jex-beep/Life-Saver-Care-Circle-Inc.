@@ -119,6 +119,29 @@
   background: var(--accent);
 }
 
+/* Brand-coloured nav labels: Yakap = warm/orange, Gamot = accent/purple.
+   Two-class selectors keep the identity colour across hover/active, which
+   the senior-ui layer otherwise recolours to --accent-ink. The active
+   background + underline still come from the base .active rules. */
+.nav-links a.nav-yakap {
+  color: var(--warm);
+}
+.nav-links a.nav-yakap:hover,
+.nav-links a.nav-yakap.active {
+  color: var(--warm-strong);
+}
+.nav-links a.nav-yakap.active::after {
+  background: var(--warm);
+}
+
+.nav-links a.nav-gamot {
+  color: var(--accent);
+}
+.nav-links a.nav-gamot:hover,
+.nav-links a.nav-gamot.active {
+  color: var(--accent-strong);
+}
+
 .nav-links .nav-cta {
   background: var(--warm);
   color: #fff;

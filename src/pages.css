@@ -318,9 +318,56 @@
   font-size: 16px;
 }
 
+/* "Coming soon" placeholder (booking / ordering not live yet) */
+.coming-soon {
+  text-align: center;
+  align-items: center;
+  gap: 18px;
+}
+
+.coming-soon .section-eyebrow {
+  margin-bottom: 4px;
+}
+
+.coming-soon-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  color: var(--accent-strong);
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.coming-soon-title {
+  font-size: clamp(32px, 5vw, 52px);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.coming-soon-note {
+  max-width: 52ch;
+  margin-inline: auto;
+}
+
+.coming-soon-back {
+  margin-top: 8px;
+  align-self: center;
+}
+
 .finder {
   flex: 1;
   min-height: 0;
+  /* allow the grid to shrink below its content's intrinsic width instead of
+     overflowing narrow screens (grid/flex items default to min-width:auto) */
+  min-width: 0;
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
   gap: 20px;
@@ -331,6 +378,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  min-width: 0;
 }
 
 .finder-locate {
@@ -391,6 +439,10 @@
   border: 1px solid var(--border);
   background: var(--surface);
   cursor: pointer;
+  /* the list is a flex column; without this, rows shrink below their
+     content height and clip the two-line name + city, so let each row keep
+     its natural size and the list scroll instead */
+  flex: 0 0 auto;
   transition: border-color var(--transition), background-color var(--transition);
 }
 
@@ -472,6 +524,16 @@
   width: 100%;
   min-height: 260px;
   border: none;
+}
+
+/* Below ~750px the side-by-side finder can't fit (the clinic-list column
+   has a min-content width that overflows narrow phones and gets clipped by
+   the pager's overflow:hidden). Stack list above map — the finder page
+   scrolls, so the taller stacked layout is fine. */
+@media (max-width: 860px) {
+  .finder {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Shop (pharmacy catalog) */
@@ -646,7 +708,7 @@
 }
 
 .ab-cover-paged .ab-cover-text {
-  padding-bottom: 64px;
+  padding-bottom: 160px;
 }
 
 .ab-statbar-paged {
@@ -657,12 +719,15 @@
 .ab-section-paged {
   width: 100%;
   max-width: 1160px;
-  margin: 0 auto;
+  /* nudge the About content up a bit (make the -16px more negative to raise
+     it further; don't go past ~-28px on scroll pages or the header slides
+     under the navbar) */
+  margin: -16px auto 0;
   padding: 0;
 }
 
 .ab-section-paged .ab-head {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .ab-vision-paged {
@@ -675,7 +740,7 @@
 }
 
 .ab-missions-paged .ab-mission {
-  padding: 14px 0;
+  padding: 11px 0;
 }
 
 .ab-missions-paged .ab-mission-num {
@@ -1009,22 +1074,24 @@
 .ab-story {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
-  gap: 72px;
+  gap: 52px;
   align-items: start;
 }
 
 .ab-lead {
   font-family: var(--heading);
-  font-size: clamp(20px, 2.2vw, 25px);
+  font-size: clamp(21px, 2.4vw, 27px);
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.4;
   letter-spacing: -0.01em;
   color: var(--text-h);
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .ab-story-text p:not(.ab-lead) {
-  margin-bottom: 20px;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 15px;
   max-width: 58ch;
 }
 
@@ -1073,7 +1140,6 @@
 /* 02 Vision */
 
 .ab-vision {
-  margin-top: 104px;
   background:
     linear-gradient(rgba(19, 16, 42, 0.85), rgba(19, 16, 42, 0.85)),
     url('/people.jpg') center / cover no-repeat;
@@ -1088,9 +1154,9 @@
 
 .ab-vision-text {
   font-family: var(--heading);
-  font-size: clamp(24px, 3.4vw, 38px);
+  font-size: clamp(27px, 3.8vw, 42px);
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.35;
   letter-spacing: -0.015em;
   color: #fff;
 }
@@ -1133,8 +1199,8 @@
 }
 
 .ab-mission p {
-  font-size: 16px;
-  line-height: 1.65;
+  font-size: 17px;
+  line-height: 1.55;
   max-width: 72ch;
   color: var(--text-h);
 }
@@ -1144,12 +1210,12 @@
 .ab-values {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 56px;
+  column-gap: 44px;
 }
 
 .ab-value {
   border-top: 1px solid var(--border);
-  padding: 26px 0 30px;
+  padding: 18px 0 20px;
 }
 
 .ab-value-name {
@@ -1175,7 +1241,7 @@
 }
 
 .ab-value-name h3 {
-  font-size: 24px;
+  font-size: 25px;
   font-weight: 700;
   letter-spacing: -0.01em;
   margin: 0;
@@ -1183,9 +1249,9 @@
 }
 
 .ab-value p {
-  margin-top: 10px;
-  font-size: 15px;
-  line-height: 1.65;
+  margin-top: 8px;
+  font-size: 16px;
+  line-height: 1.55;
   max-width: 48ch;
 }
 
@@ -1302,7 +1368,10 @@
 
 .ann-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  /* fixed-width columns + center so 1–4 cards stay centered (no off-left
+     lone card when there's a single announcement) */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 360px));
+  justify-content: center;
   gap: 20px;
   text-align: left;
   max-width: 980px;
@@ -2439,7 +2508,6 @@ code {
   }
 
   .ab-vision {
-    margin-top: 64px;
     padding: 72px 24px;
   }
 
@@ -3227,5 +3295,5 @@ code {
   overflow-y: auto;
   justify-content: flex-start;
   /* clear the fixed navbar so scrolling form content doesn't start under it */
-  padding-top: calc(var(--navbar-h) + 28px);
+  padding-top: calc(var(--navbar-h) + 8px);
 }

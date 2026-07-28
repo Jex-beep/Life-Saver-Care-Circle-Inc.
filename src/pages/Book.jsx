@@ -5,6 +5,7 @@ import { branchBadges } from './Branches.jsx'
 import { CheckCircleIcon } from '../components/Icons.jsx'
 import Pager from '../components/Pager.jsx'
 import FooterPage from '../components/FooterPage.jsx'
+import ComingSoon from '../components/ComingSoon.jsx'
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
@@ -367,7 +368,18 @@ export default function Book() {
   return (
     <Pager
       pages={[
-        { id: 'book', label: 'Book an Appointment', scroll: true, content: wizardPage },
+        {
+          id: 'book',
+          label: 'Book an Appointment',
+          scroll: true,
+          content: (
+            <ComingSoon
+              eyebrow="Appointments"
+              title="Book an Appointment"
+              note="Online appointment booking is coming soon. Please check back shortly to reserve a visit at a Yakap clinic near you."
+            />
+          ),
+        },
         { id: 'contact', label: 'Contact Us', content: <FooterPage />, scroll: true },
       ]}
     />

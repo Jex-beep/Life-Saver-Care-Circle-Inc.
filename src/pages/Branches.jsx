@@ -5,6 +5,7 @@ import { BRANCHES } from '../data/branches.js'
 import Pager from '../components/Pager.jsx'
 import FooterPage from '../components/FooterPage.jsx'
 import BranchFinder from '../components/BranchFinder.jsx'
+import ComingSoon from '../components/ComingSoon.jsx'
 
 /* kept for the booking wizard's branch cards */
 export function branchBadges(targetClient) {
@@ -95,7 +96,13 @@ export default function Branches() {
       id: 'clinics',
       label: 'Yakap Clinic',
       scroll: true,
-      content: <FinderPage branches={branches} error={error} />,
+      content: (
+        <ComingSoon
+          eyebrow="Our network"
+          title="Yakap Clinics"
+          note="Our PhilHealth-accredited Yakap primary care clinics are launching soon. Check back shortly to find the one closest to you."
+        />
+      ),
     },
     { id: 'contact', label: 'Contact Us', content: <FooterPage />, scroll: true },
   ]

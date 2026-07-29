@@ -27,7 +27,7 @@ export default function Navbar() {
     <header className="navbar">
       <div className="navbar-inner">
         <Link to="/" className="brand" onClick={() => setMenuOpen(false)}>
-          <img src="/box-type-logo.png" alt="" className="brand-logo" />
+          <img src="/LS_LOGO.png" alt="" className="brand-logo" />
           <span className="brand-name">Life Saver</span>
         </Link>
 

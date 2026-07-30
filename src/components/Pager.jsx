@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react'
 
 /**
- * Full-viewport page-by-page layout (no document scrolling).
- * Designed for older visitors: very large, labeled Next/Back buttons on the
- * screen edges, a progress line naming the next page, and keyboard arrows.
+ * One markup, two layouts — the switch is pure CSS so it can never get out of
+ * sync with the viewport (see mobile.css):
+ *
+ * Desktop — full-viewport horizontal pages, no document scrolling, with large
+ * labeled Back/Next controls for older visitors.
+ *
+ * Mobile (≤860px) — the same pages stack into one natural vertical scroll,
+ * each introduced by a numbered heading, since phones are too narrow to page
+ * sideways comfortably.
  *
  * pages: [{ id, label, content, scroll?: true }]
- *   - `scroll: true` lets that page's content scroll internally
- *     (safety valve for dense interactive pages like booking or catalogs).
  */
 export default function Pager({ pages }) {
   const [idx, setIdx] = useState(0)
@@ -18,6 +22,7 @@ export default function Pager({ pages }) {
   useEffect(() => {
     const onKey = (e) => {
       if (e.target.closest('input, textarea, select')) return
+      if (window.matchMedia('(max-width: 860px)').matches) return
       if (e.key === 'ArrowRight' && idx < count - 1) setIdx(idx + 1)
       if (e.key === 'ArrowLeft' && idx > 0) setIdx(idx - 1)
     }
@@ -29,12 +34,13 @@ export default function Pager({ pages }) {
 
   return (
     <div className="pager">
-      <div className="pager-track" style={{ transform: `translateX(-${idx * 100}%)` }}>
+      {/* --page drives the desktop slide; mobile CSS ignores it */}
+      <div className="pager-track" style={{ '--page': idx }}>
         {pages.map((p) => (
           <section
             key={p.id}
+            id={`section-${p.id}`}
             className={`pager-page ${p.scroll ? 'pager-page-scroll' : ''}`}
-            aria-hidden={pages[idx].id !== p.id}
           >
             <div className="pager-page-inner">{p.content}</div>
           </section>

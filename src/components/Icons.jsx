@@ -180,6 +180,29 @@ export const BuildingIcon = (props) => (
   </Icon>
 )
 
+export const HomeIcon = (props) => (
+  <Icon {...props}>
+    <path d="M3 10.5 12 3l9 7.5" />
+    <path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" />
+    <path d="M9.5 21v-6h5v6" />
+  </Icon>
+)
+
+export const InfoIcon = (props) => (
+  <Icon {...props}>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 16v-4" />
+    <path d="M12 8h.01" />
+  </Icon>
+)
+
+export const SearchIcon = (props) => (
+  <Icon {...props}>
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.3-4.3" />
+  </Icon>
+)
+
 export const MegaphoneIcon = (props) => (
   <Icon {...props}>
     <path d="m3 11 18-5v12L3 14v-3z" />

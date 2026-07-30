@@ -14,6 +14,7 @@ import PharmacyStatic from './pages/static/PharmacyStatic.jsx'
 import AdminRoutes from './pages/admin/AdminRoutes.jsx'
 import './App.css'
 import './pages.css'
+import './mobile.css'
 import './senior-ui.css'
 
 /* Site-wide bar for the announcement the superadmin pinned (one at a time) */

@@ -1,0 +1,797 @@
+/* The mobile drawer must not exist on desktop at all — without this it
+   renders as a plain list at the top of the page. */
+.mnav,
+.mnav-backdrop {
+  display: none;
+}
+
+/* ============================================================
+   Mobile experience (≤ 860px)
+   Phones scroll naturally instead of paging sideways, with
+   age-friendly sizing: large type, 56px+ tap rows, generous
+   spacing, and an animated full-screen menu.
+   Loaded last so these rules win over the desktop layout.
+   ============================================================ */
+
+@media (max-width: 860px) {
+  /* ---------- Let the document scroll again ---------- */
+
+  /* index.css locks the document for the desktop paged layout
+     (`body { overflow: hidden }`) — undo that so phones scroll normally.
+     `clip` on the x-axis (not `hidden`) avoids turning the page into a
+     scroll container, leaving vertical scrolling untouched. */
+  html {
+    overflow-x: clip;
+  }
+
+  body {
+    overflow: visible;
+    overflow-x: clip;
+    overscroll-behavior-y: auto;
+  }
+
+  :root {
+    font-size: 17.5px;
+  }
+
+  .pub-shell {
+    height: auto;
+    min-height: 100dvh;
+    display: block;
+  }
+
+  .pub-shell > main {
+    overflow: visible;
+    min-height: 0;
+  }
+
+  /* ---------- Pages become one vertical scroll ---------- */
+
+  .pager {
+    height: auto;
+    overflow: visible;
+  }
+
+  .pager-track {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    /* never slide sideways on a phone, whatever --page holds */
+    transform: none !important;
+    transition: none;
+  }
+
+  .pager-page {
+    width: 100%;
+    height: auto;
+    flex-shrink: 1;
+    overflow: visible;
+    padding: 34px 18px 38px;
+    border-top: 1px solid var(--border);
+  }
+
+  .pager-page:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .pager-page:nth-child(even) {
+    background: var(--code-bg);
+  }
+
+  .pager-page-inner,
+  .pager-page-scroll .pager-page-inner {
+    height: auto;
+    display: block;
+    overflow: visible;
+    padding: 0;
+  }
+
+  /* Desktop pager chrome has no place here */
+  .pager-nav,
+  .pager-progress {
+    display: none !important;
+  }
+
+  /* ---------- Navbar ---------- */
+
+  /* Desktop floats the bar over the hero (position: absolute). On a scrolling
+     phone that would overlay the first section and then scroll out of reach —
+     sticky keeps the menu available at all times and reserves its own space. */
+  .navbar {
+    position: sticky;
+    top: 0;
+  }
+
+  .navbar-inner {
+    padding: 12px 16px;
+  }
+
+  .brand-logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .brand-name {
+    font-size: 25px;
+  }
+
+  /* desktop links hidden — the drawer takes over */
+  .nav-links {
+    display: none !important;
+  }
+
+  .menu-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 10px;
+    width: auto;
+    min-height: 52px;
+    padding: 8px 16px 8px 12px;
+    border: 2px solid var(--accent-border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--accent-strong);
+    font-family: var(--heading);
+    font-size: 15px;
+    font-weight: 700;
+    z-index: 120;
+    transition: background-color var(--transition), border-color var(--transition);
+  }
+
+  .menu-toggle.is-open {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* animated hamburger → X */
+  .menu-bars {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 24px;
+    height: 18px;
+  }
+
+  .menu-bars i {
+    display: block;
+    height: 3px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 160ms ease;
+  }
+
+  .menu-toggle.is-open .menu-bars i:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+
+  .menu-toggle.is-open .menu-bars i:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-toggle.is-open .menu-bars i:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  /* ---------- Mobile drawer ---------- */
+
+  .mnav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(24, 22, 46, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    /* No backdrop-filter while closed: a fixed, full-viewport element with a
+       backdrop-filter forces a compositing layer that some mobile browsers
+       still paint through `visibility: hidden`, washing out the page.
+       The blur is added only in the open state below. */
+    backdrop-filter: none;
+    /* only opacity animates — visibility flips instantly so the overlay can
+       never be trapped mid-transition on devices with stalled animation clocks */
+    transition: opacity 280ms ease;
+  }
+
+  .mnav-backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    backdrop-filter: blur(3px);
+  }
+
+  .mnav {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(92vw, 420px);
+    z-index: 100;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    box-shadow: -18px 0 50px rgba(24, 22, 46, 0.22);
+    padding: 92px 20px 28px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 340ms cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+
+  .mnav.is-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .mnav-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+
+  .mnav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* staggered entrance for each row */
+  .mnav-list li,
+  .mnav-cta,
+  .mnav-call {
+    opacity: 0;
+    transform: translateX(26px);
+  }
+
+  .mnav.is-open .mnav-list li,
+  .mnav.is-open .mnav-cta,
+  .mnav.is-open .mnav-call {
+    animation: mnavIn 420ms cubic-bezier(0.2, 0.9, 0.25, 1) forwards;
+    animation-delay: calc(120ms + var(--i, 0) * 55ms);
+  }
+
+  @keyframes mnavIn {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .mnav-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 68px;
+    padding: 12px 14px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    text-decoration: none;
+    color: var(--text-h);
+    transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+  }
+
+  .mnav-item:active {
+    transform: scale(0.98);
+    background: var(--accent-bg);
+  }
+
+  .mnav-item.active {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+  }
+
+  .mnav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--accent-bg);
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .mnav-icon.nav-gamot {
+    background: rgba(232, 71, 31, 0.1);
+    color: var(--warm-strong);
+  }
+
+  .mnav-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+    min-width: 0;
+  }
+
+  .mnav-text strong {
+    font-family: var(--heading);
+    font-size: 19px;
+    font-weight: 700;
+  }
+
+  .mnav-text em {
+    font-style: normal;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .mnav-chevron {
+    margin-left: auto;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .mnav-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 62px;
+    border-radius: 999px;
+    background: var(--warm);
+    color: #fff;
+    font-family: var(--heading);
+    font-size: 19px;
+    font-weight: 700;
+    text-decoration: none;
+    margin-bottom: 16px;
+  }
+
+  .mnav-call {
+    display: block;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-strong);
+    text-decoration: none;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    background: var(--accent-bg);
+  }
+
+  /* ---------- Type & controls ---------- */
+
+  h1 { font-size: clamp(30px, 8.5vw, 42px); }
+  h2 { font-size: clamp(24px, 6.5vw, 30px); }
+
+  .btn {
+    min-height: 54px;
+    font-size: 17px;
+    padding: 0 24px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-sm {
+    width: auto;
+    min-height: 46px;
+  }
+
+  .hero-actions,
+  .fpage-actions,
+  .ab-cta-actions,
+  .section-cta {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .section-sub {
+    font-size: 16.5px;
+  }
+
+  /* ---------- Home ---------- */
+
+  .hp-hero {
+    margin: 0;
+    min-height: auto;
+    display: block;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .hp-hero-inner {
+    display: block;
+    padding: 30px 20px 34px;
+  }
+
+  .hero-heading {
+    margin-bottom: 14px;
+  }
+
+  .hero-text {
+    font-size: 17px;
+    margin-bottom: 22px;
+  }
+
+  .hero-badges {
+    font-size: 14px;
+    margin-top: 20px;
+  }
+
+  .hp-hero-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 26px;
+  }
+
+  .hp-hero-stats .stat {
+    padding: 14px 6px;
+  }
+
+  .hp-hero-stats .stat-number {
+    font-size: 24px;
+  }
+
+  .hp-hero-stats .stat-label {
+    font-size: 11.5px;
+  }
+
+  .services-grid,
+  .hp-services,
+  .hp-products,
+  .facilities-grid,
+  .hp-facilities,
+  .ann-grid,
+  .about-photos,
+  .fpage-tiles {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  .fpage-tiles {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .fpage-tile {
+    padding: 20px 12px;
+  }
+
+  .hp-about {
+    display: block;
+  }
+
+  .hp-about .about-photos {
+    margin-top: 20px;
+  }
+
+  .hp-about .about-photos img,
+  .hp-facilities .facility-card img {
+    height: 190px;
+  }
+
+  /* ---------- About ---------- */
+
+  .ab-cover-paged {
+    margin: 0;
+    min-height: 62vh;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .ab-cover-text {
+    padding: 0 20px 34px;
+  }
+
+  .ab-statbar,
+  .ab-statbar-paged {
+    grid-template-columns: 1fr 1fr;
+    margin: 20px 0 0;
+  }
+
+  .ab-statbar > div + div {
+    border-left: none;
+  }
+
+  .ab-statbar > div:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+
+  .ab-statbar > div:nth-child(even) {
+    border-left: 1px solid var(--border);
+  }
+
+  .ab-vision-paged {
+    margin: 0;
+    padding: 34px 20px;
+    border-radius: var(--radius-lg);
+  }
+
+  .ab-story,
+  .ab-values,
+  .ab-mosaic {
+    display: block;
+  }
+
+  .ab-collage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding-bottom: 0;
+    margin-top: 20px;
+  }
+
+  .ab-collage-main,
+  .ab-collage-offset {
+    position: static;
+    width: 100%;
+    height: 160px;
+    border: none;
+    box-shadow: none;
+  }
+
+  .ab-value {
+    padding: 18px 0 20px;
+  }
+
+  .ab-value p {
+    max-width: none;
+  }
+
+  .ab-mosaic figure {
+    height: 200px;
+    margin-bottom: 12px;
+  }
+
+  .ab-mission {
+    grid-template-columns: 52px 1fr;
+  }
+
+  /* ---------- Finder (clinics / pharmacies) ---------- */
+
+  .finder-section {
+    display: block;
+  }
+
+  .finder {
+    display: block;
+  }
+
+  .finder-locate-btn {
+    width: 100%;
+  }
+
+  .finder-place {
+    flex-direction: column;
+  }
+
+  .finder-place input {
+    min-height: 54px;
+    font-size: 17px;
+  }
+
+  .finder-place .btn {
+    width: 100%;
+  }
+
+  .finder-list {
+    max-height: 300px;
+    margin-bottom: 18px;
+  }
+
+  .finder-item {
+    min-height: 62px;
+    padding: 14px 16px;
+  }
+
+  .finder-item-name {
+    font-size: 16.5px;
+  }
+
+  .finder-map-col {
+    height: 380px;
+  }
+
+  .finder-map {
+    min-height: 220px;
+  }
+
+  .finder-map-actions {
+    width: 100%;
+  }
+
+  .finder-map-actions .btn {
+    width: auto;
+    flex: 1;
+  }
+
+  /* ---------- Pharmacy shop ---------- */
+
+  .shop-layout {
+    display: block;
+  }
+
+  .shop-controls {
+    flex-direction: column;
+  }
+
+  .shop-branch-select,
+  .shop-search {
+    width: 100%;
+    min-width: 0;
+    font-size: 17px;
+  }
+
+  .shop-cats {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .shop-cats::-webkit-scrollbar {
+    display: none;
+  }
+
+  .shop-cat {
+    flex-shrink: 0;
+    min-height: 50px;
+    font-size: 16px;
+  }
+
+  .cart-panel {
+    position: static;
+    margin-top: 20px;
+  }
+
+  .shop-pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .shop-pagination .btn {
+    width: 100%;
+  }
+
+  /* ---------- Booking ---------- */
+
+  .steps {
+    margin-bottom: 28px;
+  }
+
+  .date-time-layout {
+    display: block;
+  }
+
+  .cal {
+    margin-bottom: 20px;
+  }
+
+  .cal-day {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .slot {
+    min-height: 54px;
+    font-size: 16px;
+  }
+
+  .slot-grid {
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  }
+
+  .branch-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-card {
+    padding: 20px;
+  }
+
+  .form-card input,
+  .form-card select,
+  .form-card textarea {
+    font-size: 17px;
+    min-height: 52px;
+  }
+
+  .track-form {
+    flex-direction: column;
+  }
+
+  .track-form input {
+    min-height: 54px;
+    font-size: 18px;
+  }
+
+  /* ---------- Coming-soon placeholder ---------- */
+
+  .coming-soon {
+    padding: 20px 0 8px;
+    text-align: center;
+  }
+
+  .coming-soon-title {
+    margin-bottom: 10px;
+  }
+
+  .coming-soon-note {
+    font-size: 16.5px;
+  }
+
+  .coming-soon-back {
+    margin-top: 8px;
+  }
+
+  /* Inline text links need a real tap area on touch screens */
+  .cm-form-link,
+  .finder-map-link,
+  .ab-arrow-link,
+  .link-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 6px 4px;
+  }
+
+  /* ---------- Contact page ---------- */
+
+  .fpage-note {
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+
+  /* ---------- Announcement bar ---------- */
+
+  .ann-bar {
+    font-size: 13.5px;
+    padding: 10px 44px 10px 14px;
+    text-align: left;
+  }
+}
+
+/* Narrow phones */
+@media (max-width: 420px) {
+  .fpage-tiles {
+    grid-template-columns: 1fr !important;
+  }
+
+  .ab-collage-main,
+  .ab-collage-offset {
+    height: 130px;
+  }
+
+  .brand-logo {
+    width: 52px;
+    height: 52px;
+  }
+
+  .brand-name {
+    font-size: 22px;
+  }
+
+  .menu-toggle-text {
+    display: none;
+  }
+}
+
+/* Respect reduced motion everywhere in the mobile UI */
+@media (prefers-reduced-motion: reduce) {
+  .mnav,
+  .mnav-backdrop,
+  .menu-bars i {
+    transition-duration: 0.01ms !important;
+  }
+
+  .mnav.is-open .mnav-list li,
+  .mnav.is-open .mnav-cta,
+  .mnav.is-open .mnav-call {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

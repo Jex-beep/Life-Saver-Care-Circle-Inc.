@@ -25,6 +25,7 @@
 .pager-track {
   display: flex;
   height: 100%;
+  transform: translateX(calc(var(--page, 0) * -100%));
   transition: transform 0.45s ease;
 }
 
@@ -1868,7 +1869,9 @@ code {
 }
 
 .step.done::before {
-  content: 'âœ“';
+  /* unicode escape, not a literal glyph — a literal ✓ gets mangled if the
+     file is ever re-saved in a non-UTF-8 encoding */
+  content: '\2713';
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
@@ -2963,6 +2966,16 @@ code {
   }
 }
 
+/* Frosted panel behind this section's content.
+   `position: relative` is REQUIRED: without it the absolutely-positioned
+   ::before anchors to .pager instead — which spans the whole document on
+   mobile — and its blur washes out every later section on the page.
+   The children are also lifted above it, since a positioned pseudo-element
+   paints above non-positioned text in the same stacking context. */
+.ab-home {
+  position: relative;
+}
+
 .ab-home::before {
   content: '';
   position: absolute;
@@ -2971,6 +2984,11 @@ code {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 0;
+}
+
+.ab-home > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* ---------- Contact page v2 ---------- */

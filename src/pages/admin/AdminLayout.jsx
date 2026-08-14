@@ -8,6 +8,7 @@ import {
   GaugeIcon,
   SettingsIcon,
   BuildingIcon,
+  BoxIcon,
   MegaphoneIcon,
   LogOutIcon,
 } from '../../components/Icons.jsx'
@@ -17,10 +18,17 @@ const PAGE_TITLES = {
   '/admin/bookings': 'Bookings',
   '/admin/orders': 'Pharmacy Orders',
   '/admin/capacity': 'Capacity & Sessions',
+  '/admin/inventory': 'Medicine Stock',
   '/admin/schedule': 'Weekly Schedule',
   '/admin/settings': 'Branch Settings',
   '/admin/announcements': 'Announcements',
   '/admin/manage': 'Manage System',
+}
+
+const ROLE_LABELS = {
+  super: 'Corporate admin',
+  manager: 'Branch manager',
+  handler: 'Branch handler',
 }
 
 function NavItem({ to, end = false, Icon, children }) {
@@ -33,7 +41,7 @@ function NavItem({ to, end = false, Icon, children }) {
 }
 
 export default function AdminLayout() {
-  const { admin, logout, isSuper } = useAdmin()
+  const { admin, logout, isSuper, isManager } = useAdmin()
   const location = useLocation()
   const title = PAGE_TITLES[location.pathname] || 'Dashboard'
   const today = new Date().toLocaleDateString('en-PH', {
@@ -65,22 +73,28 @@ export default function AdminLayout() {
           <NavItem to="/admin" end Icon={LayoutGridIcon}>Dashboard</NavItem>
           <NavItem to="/admin/bookings" Icon={CalendarIcon}>Bookings</NavItem>
           <NavItem to="/admin/orders" Icon={PillIcon}>Orders</NavItem>
+          <NavItem to="/admin/inventory" Icon={BoxIcon}>Medicine Stock</NavItem>
           <NavItem to="/admin/capacity" Icon={GaugeIcon}>Capacity</NavItem>
         </nav>
 
-        <p className="adm-nav-label">Configuration</p>
-        <nav className="adm-nav">
-          {!isSuper && <NavItem to="/admin/schedule" Icon={ClockIcon}>Schedule</NavItem>}
-          {!isSuper && <NavItem to="/admin/settings" Icon={SettingsIcon}>Branch Settings</NavItem>}
-          {isSuper && <NavItem to="/admin/announcements" Icon={MegaphoneIcon}>Announcements</NavItem>}
-          {isSuper && <NavItem to="/admin/manage" Icon={BuildingIcon}>Manage System</NavItem>}
-        </nav>
+        {/* Handlers work the counter; changing how the branch runs is not theirs. */}
+        {isManager && (
+          <>
+            <p className="adm-nav-label">Configuration</p>
+            <nav className="adm-nav">
+              {!isSuper && <NavItem to="/admin/schedule" Icon={ClockIcon}>Schedule</NavItem>}
+              {!isSuper && <NavItem to="/admin/settings" Icon={SettingsIcon}>Branch Settings</NavItem>}
+              {isSuper && <NavItem to="/admin/announcements" Icon={MegaphoneIcon}>Announcements</NavItem>}
+              {isSuper && <NavItem to="/admin/manage" Icon={BuildingIcon}>Manage System</NavItem>}
+            </nav>
+          </>
+        )}
 
         <div className="adm-user">
           <span className="adm-avatar" aria-hidden="true">{initials}</span>
           <div className="adm-user-meta">
             <strong>{admin.display_name}</strong>
-            <span>{isSuper ? 'Corporate admin' : 'Branch admin'}</span>
+            <span>{ROLE_LABELS[admin.role] || 'Branch staff'}</span>
           </div>
           <button type="button" className="adm-logout" onClick={logout} aria-label="Sign out" title="Sign out">
             <LogOutIcon size={17} />

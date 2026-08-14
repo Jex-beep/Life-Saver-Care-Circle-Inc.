@@ -7,6 +7,7 @@ import Dashboard from './Dashboard.jsx'
 import AdminBookings from './AdminBookings.jsx'
 import AdminOrders from './AdminOrders.jsx'
 import Capacity from './Capacity.jsx'
+import Inventory from './Inventory.jsx'
 import Announcements from './Announcements.jsx'
 import Schedule from './Schedule.jsx'
 import Settings from './Settings.jsx'
@@ -30,7 +31,17 @@ export default function AdminRoutes() {
     setSession(null)
   }
 
-  const value = { session, admin: session?.admin, login, logout, isSuper: session?.admin?.role === 'super' }
+  const role = session?.admin?.role
+  const value = {
+    session,
+    admin: session?.admin,
+    login,
+    logout,
+    isSuper: role === 'super',
+    /* Managers own what the branch carries; handlers work the counter. */
+    isManager: role === 'manager' || role === 'super',
+    isHandler: role === 'handler',
+  }
 
   return (
     <AdminContext.Provider value={value}>
@@ -43,8 +54,9 @@ export default function AdminRoutes() {
             <Route path="bookings" element={<AdminBookings />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="capacity" element={<Capacity />} />
+            <Route path="inventory" element={<Inventory />} />
             <Route path="schedule" element={<Schedule />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="settings" element={value.isManager ? <Settings /> : <Navigate to="/admin" replace />} />
             <Route path="announcements" element={value.isSuper ? <Announcements /> : <Navigate to="/admin" replace />} />
             <Route path="manage" element={value.isSuper ? <Manage /> : <Navigate to="/admin" replace />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />

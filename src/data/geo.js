@@ -76,7 +76,17 @@ export function haversineKm(a, b) {
   return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s))
 }
 
+/**
+ * Where a branch actually is. Branches added with a Google Maps embed carry
+ * real coordinates pulled from that embed; older ones fall back to the centre
+ * of their city, which is close enough to rank them but not to pin them.
+ */
 export function branchCoords(branch) {
+  const lat = Number(branch.latitude)
+  const lng = Number(branch.longitude)
+  if (Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0)) {
+    return { lat, lng }
+  }
   return CITY_COORDS[branch.city] || null
 }
 
@@ -111,13 +121,23 @@ export async function resolvePlace(text) {
   return null
 }
 
-/* Keyless Google Maps iframe embed centered on the branch */
+/**
+ * Google Maps iframe embed for a branch. When the superadmin pasted an embed
+ * for this branch we use it — that pin is exact. Otherwise fall back to a
+ * keyless name search, which lands on roughly the right block.
+ * The stored URL is validated server-side (see server/src/maps.js).
+ */
 export function mapEmbedUrl(branch) {
+  if (branch.map_embed_src) return branch.map_embed_src
   const q = `${branch.name}, ${branch.city}, ${branch.province}, Philippines`
   return `https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=15&output=embed`
 }
 
 export function mapsLinkUrl(branch) {
+  const coords = branchCoords(branch)
+  if (branch.latitude && branch.longitude && coords) {
+    return `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`
+  }
   const q = `${branch.name}, ${branch.city}, ${branch.province}, Philippines`
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
 }

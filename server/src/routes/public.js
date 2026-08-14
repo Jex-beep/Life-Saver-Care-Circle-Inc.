@@ -29,12 +29,24 @@ function inBlock(block, timeStr) {
 router.get('/branches', async (_req, res) => {
   const { data, error } = await db
     .from('branches')
-    .select('id, name, target_client, area, province, city, address, phone')
+    .select('id, name, target_client, area, province, city, address, phone, map_embed_src, latitude, longitude')
     .eq('is_active', true)
     .order('area')
     .order('province')
     .order('city')
-  if (error) return res.status(500).json({ error: error.message })
+  if (error) {
+    /* map columns arrive with migration 004 — fall back so the finder still works */
+    if (/map_embed_src|latitude|longitude/.test(error.message)) {
+      const { data: legacy, error: legacyErr } = await db
+        .from('branches')
+        .select('id, name, target_client, area, province, city, address, phone')
+        .eq('is_active', true)
+        .order('area')
+      if (legacyErr) return res.status(500).json({ error: legacyErr.message })
+      return res.json(legacy)
+    }
+    return res.status(500).json({ error: error.message })
+  }
   res.json(data)
 })
 
@@ -317,17 +329,56 @@ router.get('/announcements', async (req, res) => {
   res.json(data)
 })
 
-/* ---------- Products ---------- */
+/* ---------- Products ----------
+   Medicines are stocked per branch, so the catalog depends on where the
+   customer is buying. Every medicine any branch carries is listed; the
+   `stock` field is for the chosen branch, and `available_at` names the
+   other branches holding it so the page can say "out here, but Novaliches
+   has it". */
 
-router.get('/products', async (_req, res) => {
-  const { data, error } = await db
+router.get('/products', async (req, res) => {
+  const branchId = req.query.branch_id ? Number(req.query.branch_id) : null
+
+  const { data: products, error } = await db
     .from('products')
     .select('id, name, generic_name, description, category, price, requires_rx, image_url')
     .eq('is_active', true)
     .order('category')
     .order('name')
   if (error) return res.status(500).json({ error: error.message })
-  res.json(data)
+
+  const { data: inventory, error: invErr } = await db
+    .from('branch_inventory')
+    .select('branch_id, product_id, stock, is_available')
+    .eq('is_available', true)
+
+  /* Before migration 004 there is no per-branch stock — serve the plain catalog. */
+  if (invErr) return res.json(products.map((p) => ({ ...p, stock: null, available_at: [] })))
+
+  const stockHere = new Map()
+  const availableAt = new Map()
+  for (const row of inventory) {
+    if (branchId && row.branch_id === branchId) stockHere.set(row.product_id, row.stock)
+    if (row.stock > 0) {
+      if (!availableAt.has(row.product_id)) availableAt.set(row.product_id, [])
+      availableAt.get(row.product_id).push(row.branch_id)
+    }
+  }
+
+  /* Before a branch is picked the shopper is just browsing, so show the whole
+     catalog. Once they pick one, narrow it to medicines that branch carries
+     plus anything another branch has in stock — those become the referrals. */
+  const listed = branchId
+    ? products.filter((p) => stockHere.has(p.id) || availableAt.has(p.id))
+    : products
+
+  res.json(
+    listed.map((p) => ({
+      ...p,
+      stock: branchId ? (stockHere.get(p.id) ?? 0) : null,
+      available_at: (availableAt.get(p.id) || []).filter((id) => id !== branchId),
+    }))
+  )
 })
 
 /* ---------- Pharmacy branches with payment info (for checkout) ---------- */
@@ -335,11 +386,23 @@ router.get('/products', async (_req, res) => {
 router.get('/pharmacies', async (_req, res) => {
   const { data, error } = await db
     .from('branches')
-    .select('id, name, area, province, city, gcash_number, qr_image_url')
+    .select('id, name, target_client, area, province, city, phone, gcash_number, qr_image_url, map_embed_src, latitude, longitude')
     .eq('is_active', true)
     .in('target_client', ['Yakap and Gamot - Owned', 'Drug Store - Stand Alone'])
     .order('area')
-  if (error) return res.status(500).json({ error: error.message })
+  if (error) {
+    if (/map_embed_src|latitude|longitude/.test(error.message)) {
+      const { data: legacy, error: legacyErr } = await db
+        .from('branches')
+        .select('id, name, target_client, area, province, city, phone, gcash_number, qr_image_url')
+        .eq('is_active', true)
+        .in('target_client', ['Yakap and Gamot - Owned', 'Drug Store - Stand Alone'])
+        .order('area')
+      if (legacyErr) return res.status(500).json({ error: legacyErr.message })
+      return res.json(legacy)
+    }
+    return res.status(500).json({ error: error.message })
+  }
   res.json(data)
 })
 
@@ -371,6 +434,54 @@ router.post('/orders', async (req, res) => {
 
   const online = payment_method === 'online'
   const reference = makeReference('LS-OR')
+
+  /* Take the stock down FIRST, one atomic call per medicine. If any line
+     fails (someone else bought the last box a second ago) we put back what
+     we already took, so a rejected order never eats stock. */
+  const reserved = []
+  const releaseReserved = async () => {
+    for (const item of reserved) {
+      await db.rpc('adjust_stock', {
+        p_branch_id: branch_id,
+        p_product_id: item.product_id,
+        p_delta: item.qty,
+        p_reason: 'returned',
+        p_note: `Released — order ${reference} not completed`,
+        p_order_reference: reference,
+        p_admin_id: null,
+      })
+    }
+  }
+
+  for (const item of priced) {
+    const { error: stockErr } = await db.rpc('adjust_stock', {
+      p_branch_id: branch_id,
+      p_product_id: item.product_id,
+      p_delta: -item.qty,
+      p_reason: 'online_order',
+      p_note: '',
+      p_order_reference: reference,
+      p_admin_id: null,
+    })
+    if (!stockErr) {
+      reserved.push(item)
+      continue
+    }
+
+    /* Migration 004 not applied yet — this deployment has no per-branch
+       stock, so fall through and record the order as before. */
+    if (/adjust_stock|branch_inventory/.test(stockErr.message) && !/STOCK/.test(stockErr.message)) break
+
+    await releaseReserved()
+    if (/MEDICINE_NOT_STOCKED/.test(stockErr.message)) {
+      return res.status(409).json({ error: `${item.name} is not available at this branch.` })
+    }
+    if (/INSUFFICIENT_STOCK/.test(stockErr.message)) {
+      return res.status(409).json({ error: `${item.name} just went out of stock at this branch. Please adjust your order.` })
+    }
+    return res.status(500).json({ error: stockErr.message })
+  }
+
   const { data, error } = await db
     .from('orders')
     .insert({
@@ -390,7 +501,10 @@ router.post('/orders', async (req, res) => {
     })
     .select('reference, total, payment_method, payment_status, status')
     .single()
-  if (error) return res.status(500).json({ error: error.message })
+  if (error) {
+    await releaseReserved()
+    return res.status(500).json({ error: error.message })
+  }
   res.status(201).json(data)
 })
 

@@ -35,8 +35,18 @@ export function requireSuper(req, res, next) {
   next()
 }
 
-/* Branch admins may only touch their own branch; super admins may pass any branch id. */
+/* Stocking medicines in is the manager's job — handlers can only sell stock down. */
+export function requireManager(req, res, next) {
+  if (req.admin?.role !== 'super' && req.admin?.role !== 'manager') {
+    return res.status(403).json({ error: 'Only the branch manager can change what medicines this branch carries' })
+  }
+  next()
+}
+
+export const isSuper = (req) => req.admin?.role === 'super'
+
+/* Branch staff may only touch their own branch; super admins may pass any branch id. */
 export function scopedBranchId(req, requestedId) {
-  if (req.admin.role === 'super') return requestedId ?? null
+  if (isSuper(req)) return requestedId ?? null
   return req.admin.branch_id
 }

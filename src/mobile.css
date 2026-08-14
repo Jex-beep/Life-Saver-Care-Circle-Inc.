@@ -451,6 +451,31 @@
     gap: 14px;
   }
 
+  /* On desktop the shop fits itself into one screen — fixed height, grid
+     clipped to the space it has. Here the page is one long scroll instead,
+     so release every one of those constraints or the catalog gets cut off. */
+  .shop-page,
+  .shop-main,
+  .shop-layout,
+  .cart-panel {
+    display: block;
+    height: auto;
+    min-height: 0;
+    max-width: none;
+    overflow: visible;
+  }
+
+  .shop-main .product-grid {
+    display: grid;
+    overflow: visible;
+    grid-auto-rows: auto;
+  }
+
+  .finder-section {
+    height: auto;
+    max-width: none;
+  }
+
   .fpage-tiles {
     grid-template-columns: 1fr 1fr !important;
   }
@@ -706,25 +731,6 @@
   .track-form input {
     min-height: 54px;
     font-size: 18px;
-  }
-
-  /* ---------- Coming-soon placeholder ---------- */
-
-  .coming-soon {
-    padding: 20px 0 8px;
-    text-align: center;
-  }
-
-  .coming-soon-title {
-    margin-bottom: 10px;
-  }
-
-  .coming-soon-note {
-    font-size: 16.5px;
-  }
-
-  .coming-soon-back {
-    margin-top: 8px;
   }
 
   /* Inline text links need a real tap area on touch screens */

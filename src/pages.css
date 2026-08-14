@@ -319,50 +319,6 @@
   font-size: 16px;
 }
 
-/* "Coming soon" placeholder (booking / ordering not live yet) */
-.coming-soon {
-  text-align: center;
-  align-items: center;
-  gap: 18px;
-}
-
-.coming-soon .section-eyebrow {
-  margin-bottom: 4px;
-}
-
-.coming-soon-badge {
-  display: inline-flex;
-  align-items: center;
-  align-self: center;
-  gap: 8px;
-  padding: 8px 18px;
-  border-radius: 999px;
-  background: var(--accent-bg);
-  border: 1px solid var(--accent-border);
-  color: var(--accent-strong);
-  font-family: var(--heading);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.coming-soon-title {
-  font-size: clamp(32px, 5vw, 52px);
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-
-.coming-soon-note {
-  max-width: 52ch;
-  margin-inline: auto;
-}
-
-.coming-soon-back {
-  margin-top: 8px;
-  align-self: center;
-}
-
 .finder {
   flex: 1;
   min-height: 0;
@@ -539,15 +495,52 @@
 
 /* Shop (pharmacy catalog) */
 
+/* .pager-page-inner centres its children on the cross axis, which shrink-wraps
+   them — without this the shop stays ~830px wide on a 1920px monitor. */
+.shop-page,
+.finder-section {
+  width: 100%;
+  max-width: 1600px;
+  align-self: center;
+}
+
 .shop-page {
   text-align: left;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* These sections space their children with flex `gap`; the default margins
+   sit on top of that and, on a laptop, eat a whole row of cards. Let the gap
+   alone do the spacing and give the reclaimed height to the content. */
+.shop-page > *,
+.finder-section > .section-eyebrow,
+.finder-section .finder-heading h2 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Specificity has to match senior-ui.css's `.pager-page-inner > .hp-section`,
+   which sets the roomier default gap. */
+.pager-page-inner > .hp-section.shop-page,
+.pager-page-inner > .hp-section.finder-section {
+  gap: clamp(6px, 1.2vh, 18px);
+}
+
+.shop-page > h2,
+.finder-section .finder-heading h2 {
+  font-size: clamp(24px, 3.6vh, 42px);
+  line-height: 1.15;
 }
 
 .shop-controls {
   display: flex;
-  gap: 12px;
+  gap: clamp(8px, 1vw, 12px);
   flex-wrap: wrap;
-  margin: 4px 0 14px;
+  margin: 4px 0 clamp(8px, 1.4vh, 14px);
+  flex-shrink: 0;
 }
 
 .shop-branch-select,
@@ -580,17 +573,18 @@
 
 .shop-cats {
   display: flex;
-  gap: 8px;
+  gap: clamp(6px, 0.7vw, 8px);
   flex-wrap: wrap;
-  margin-bottom: 18px;
+  margin-bottom: clamp(10px, 1.8vh, 18px);
+  flex-shrink: 0;
 }
 
 .shop-cat {
   font: inherit;
-  font-size: 15px;
+  font-size: clamp(13px, 1.6vh, 15px);
   font-weight: 600;
-  padding: 10px 20px;
-  min-height: 46px;
+  padding: clamp(6px, 1vh, 10px) clamp(12px, 1.2vw, 20px);
+  min-height: clamp(36px, 4.6vh, 46px);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -617,8 +611,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin-top: 18px;
+  gap: clamp(10px, 1.2vw, 16px);
+  flex-shrink: 0;
 }
 
 .shop-pagination-label {
@@ -2219,26 +2213,57 @@ code {
 
 /* ---------- Pharmacy / shop ---------- */
 
+/* The shop is one screen: the grid takes whatever height is left over and
+   useGridFit sizes the page to match, so nothing ever needs a scrollbar. */
 .shop-layout {
+  flex: 1;
+  min-height: 0;
   display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 24px;
-  align-items: start;
+  grid-template-columns: 1fr clamp(210px, 20vw, 300px);
+  gap: clamp(12px, 1.6vw, 24px);
+  align-items: stretch;
   text-align: left;
+}
+
+.shop-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  gap: clamp(8px, 1.4vh, 16px);
 }
 
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 16px;
+  gap: clamp(8px, 1.1vw, 16px);
+}
+
+/* Inside the shop the column count comes from useGridFit and the grid absorbs
+   the leftover height rather than growing past it. Rows keep their natural
+   height and stack from the top, so cards are never stretched to fill a tall
+   screen and never squeezed into clipping on a short one — spare space just
+   stays empty below the last row. */
+.shop-main .product-grid {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  grid-auto-rows: max-content;
+  align-content: start;
 }
 
 .product-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 18px;
+  padding: clamp(10px, 1.5vh, 18px) clamp(12px, 1vw, 18px);
   background: var(--surface);
   transition: box-shadow var(--transition), border-color var(--transition);
+  /* Cards fill their grid cell and lay their own contents out top-to-bottom,
+     so the price and Add button stay pinned to the bottom edge as they shrink. */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .product-card:hover {
@@ -2250,49 +2275,96 @@ code {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: clamp(6px, 1.2vh, 14px);
+  flex-shrink: 0;
 }
 
 .product-tile {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: clamp(28px, 3.6vh, 40px);
+  height: clamp(28px, 3.6vh, 40px);
   border-radius: var(--radius-md);
   background: var(--accent-bg);
   color: var(--accent);
+  flex-shrink: 0;
 }
 
 .rx-chip {
-  font-size: 11px;
+  font-size: clamp(9.5px, 1.1vh, 11px);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  padding: 3px 10px;
+  padding: 3px clamp(6px, 0.8vw, 10px);
   border-radius: 999px;
   background: rgba(232, 71, 31, 0.08);
   color: var(--warm-strong);
   border: 1px solid rgba(232, 71, 31, 0.3);
+  white-space: nowrap;
 }
 
 .product-card h3 {
-  font-size: 16px;
+  font-size: clamp(13.5px, 1.9vh, 16px);
   margin: 0 0 2px;
   color: var(--text-h);
+  line-height: 1.3;
 }
 
 .product-cat {
-  font-size: 13px;
-  margin: 8px 0 14px;
+  font-size: clamp(11px, 1.4vh, 13px);
+  margin: clamp(4px, 0.8vh, 8px) 0 clamp(6px, 1.2vh, 14px);
   color: var(--accent);
   font-weight: 600;
+}
+
+/* ---------- Per-branch stock on the medicine cards ---------- */
+
+/* Pushed to the bottom of the card so the price row stays on the baseline
+   whatever height the card ends up at. */
+.stock-line {
+  font-size: clamp(11px, 1.4vh, 13px);
+  font-weight: 600;
+  margin: 0 0 clamp(6px, 1vh, 12px);
+  line-height: 1.4;
+  margin-top: auto;
+}
+
+.stock-ok {
+  color: var(--text-muted);
+}
+
+.stock-low {
+  color: var(--warm-strong);
+}
+
+.stock-out {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* The referral link is the point of the out-of-stock state — make it read
+   as the next action rather than as an apology. */
+.stock-out .link-btn {
+  font-weight: 700;
+  color: var(--accent);
+  text-align: left;
+}
+
+/* Dim the card, but never the referral: that is what we want them to click. */
+.product-card.is-out h3,
+.product-card.is-out .product-cat,
+.product-card.is-out .product-price,
+.product-card.is-out .product-tile {
+  opacity: 0.55;
 }
 
 .product-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .product-price {
@@ -2300,13 +2372,17 @@ code {
   color: var(--text-h);
 }
 
+/* The cart rides alongside the grid and scrolls itself if the order is long,
+   rather than pushing the page taller. */
 .cart-panel {
-  position: sticky;
-  top: 90px;
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 20px;
+  padding: clamp(12px, 1.8vh, 20px) clamp(12px, 1vw, 20px);
   background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .cart-panel h3 {

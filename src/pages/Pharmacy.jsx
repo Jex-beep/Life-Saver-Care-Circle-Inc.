@@ -2,13 +2,60 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api, peso } from '../api.js'
 import { useCart } from '../context/CartContext.jsx'
+import { branchCoords, sortByDistance } from '../data/geo.js'
 import { PillIcon } from '../components/Icons.jsx'
 import Pager from '../components/Pager.jsx'
 import FooterPage from '../components/FooterPage.jsx'
 import BranchFinder from '../components/BranchFinder.jsx'
-import ComingSoon from '../components/ComingSoon.jsx'
+import useGridFit from '../hooks/useGridFit.js'
 
-const PER_PAGE = 8
+/* Cards shrink with the viewport before the grid gives up a column or row.
+   The height is only a starting floor — useGridFit measures what the cards
+   actually need once they are on screen. */
+const CARD_MIN_W = { min: 175, vw: 0.15, max: 250 }
+const CARD_MIN_H = { min: 165, vh: 0.22, max: 250 }
+
+/**
+ * Where else can someone get this medicine? Ranked by distance from the
+ * branch they picked, so the suggestion is the closest realistic option
+ * rather than an arbitrary branch across the country.
+ */
+function nearestAlternative(product, pharmacies, currentBranch) {
+  if (!product.available_at?.length) return null
+  const options = pharmacies.filter((p) => product.available_at.includes(p.id))
+  if (options.length === 0) return null
+
+  const from = currentBranch && branchCoords(currentBranch)
+  if (!from) return options[0]
+
+  const ranked = sortByDistance(options, from)
+  return ranked[0] || options[0]
+}
+
+function StockLine({ product, pharmacies, branch, onSwitchBranch }) {
+  if (product.stock === null) return null // no branch chosen yet
+
+  if (product.stock > 0) {
+    return product.stock <= 5 ? (
+      <p className="stock-line stock-low">Only {product.stock} left here</p>
+    ) : (
+      <p className="stock-line stock-ok">{product.stock} in stock</p>
+    )
+  }
+
+  const alt = nearestAlternative(product, pharmacies, branch)
+  if (!alt) return <p className="stock-line stock-out">Out of stock at all branches</p>
+
+  return (
+    <p className="stock-line stock-out">
+      Out of stock here —{' '}
+      <button type="button" className="link-btn" onClick={() => onSwitchBranch(alt.id)}>
+        available at {alt.name.replace(/^Life Saver (Medical Services|Pharmacy) - /, '')}
+        {Number.isFinite(alt.distanceKm) && alt.distanceKm > 0 && `, ${Math.round(alt.distanceKm)} km away`}
+      </button>
+    </p>
+  )
+}
 
 function Catalog({ pharmacies, products, error, branchId, setBranchId, onCheckout }) {
   const cart = useCart()
@@ -16,17 +63,35 @@ function Catalog({ pharmacies, products, error, branchId, setBranchId, onCheckou
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(0)
 
+  /* stackAt matches the Pager's own breakpoint — below it the page scrolls
+     vertically instead of paging sideways, so there is nothing to fit to. */
+  const [gridRef, grid] = useGridFit({
+    minWidth: CARD_MIN_W,
+    minHeight: CARD_MIN_H,
+    gap: 14,
+    stackAt: 860,
+  })
+
+  const branch = pharmacies.find((p) => p.id === branchId) || null
   const categories = useMemo(() => ['All', ...new Set(products.map((p) => p.category))], [products])
   const filtered = products.filter(
     (p) =>
       (category === 'All' || p.category === category) &&
       (search === '' || `${p.name} ${p.generic_name}`.toLowerCase().includes(search.toLowerCase()))
   )
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
-  const pageItems = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE)
+  const pageCount = Math.max(1, Math.ceil(filtered.length / grid.perPage))
+  /* A narrower window fits fewer cards, which can strand the reader past the
+     last page — pull them back to the final one that still has medicines. */
+  const safePage = Math.min(page, pageCount - 1)
+  const pageItems = filtered.slice(safePage * grid.perPage, (safePage + 1) * grid.perPage)
 
   const pick = (setter) => (v) => {
     setter(v)
+    setPage(0)
+  }
+
+  const switchBranch = (id) => {
+    setBranchId(id)
     setPage(0)
   }
 
@@ -76,41 +141,50 @@ function Catalog({ pharmacies, products, error, branchId, setBranchId, onCheckou
       </div>
 
       <div className="shop-layout">
-        <div>
-          <div className="product-grid hp-products">
-            {pageItems.map((p) => (
-              <div key={p.id} className="product-card">
-                <div className="product-top">
-                  <span className="product-tile"><PillIcon size={20} /></span>
-                  {p.requires_rx && <span className="rx-chip" title="Prescription required">Rx required</span>}
+        <div className="shop-main">
+          <div className="product-grid hp-products" ref={gridRef} style={grid.style}>
+            {pageItems.map((p) => {
+              const outHere = branchId && p.stock === 0
+              return (
+                <div key={p.id} className={`product-card ${outHere ? 'is-out' : ''}`}>
+                  <div className="product-top">
+                    <span className="product-tile"><PillIcon size={20} /></span>
+                    {p.requires_rx && <span className="rx-chip" title="Prescription required">Rx required</span>}
+                  </div>
+                  <h3>{p.name}</h3>
+                  {p.generic_name && <p className="muted small">{p.generic_name}</p>}
+                  <p className="product-cat">{p.category}</p>
+                  <StockLine product={p} pharmacies={pharmacies} branch={branch} onSwitchBranch={switchBranch} />
+                  <div className="product-foot">
+                    <span className="product-price">{peso(p.price)}</span>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      disabled={!branchId || p.stock === 0}
+                      onClick={() => cart.add(p)}
+                    >
+                      {!branchId ? 'Pick a branch' : p.stock === 0 ? 'Out of stock' : 'Add'}
+                    </button>
+                  </div>
                 </div>
-                <h3>{p.name}</h3>
-                {p.generic_name && <p className="muted small">{p.generic_name}</p>}
-                <p className="product-cat">{p.category}</p>
-                <div className="product-foot">
-                  <span className="product-price">{peso(p.price)}</span>
-                  <button type="button" className="btn btn-primary btn-sm" onClick={() => cart.add(p)}>
-                    Add
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
             {pageItems.length === 0 && !error && <p className="muted center">No medicines match your search.</p>}
           </div>
 
           {pageCount > 1 && (
             <div className="shop-pagination">
-              <button type="button" className="btn btn-secondary btn-sm" disabled={page === 0} onClick={() => setPage(page - 1)}>
+              <button type="button" className="btn btn-secondary btn-sm" disabled={safePage === 0} onClick={() => setPage(safePage - 1)}>
                 ‹ Previous
               </button>
               <span className="shop-pagination-label">
-                Page {page + 1} of {pageCount} · {filtered.length} medicines
+                Page {safePage + 1} of {pageCount} · {filtered.length} medicines
               </span>
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
-                disabled={page >= pageCount - 1}
-                onClick={() => setPage(page + 1)}
+                disabled={safePage >= pageCount - 1}
+                onClick={() => setPage(safePage + 1)}
               >
                 More medicines ›
               </button>
@@ -293,6 +367,7 @@ function Confirmation({ result, branch, onNewOrder }) {
 
 export default function Pharmacy() {
   const [params] = useSearchParams()
+  const cart = useCart()
   const [pharmacies, setPharmacies] = useState([])
   const [products, setProducts] = useState([])
   const [error, setError] = useState('')
@@ -301,13 +376,21 @@ export default function Pharmacy() {
   const [result, setResult] = useState(null)
 
   useEffect(() => {
-    Promise.all([api.get('/pharmacies'), api.get('/products')])
-      .then(([ph, pr]) => {
-        setPharmacies(ph)
-        setProducts(pr)
-      })
-      .catch((e) => setError(e.message))
+    api.get('/pharmacies').then(setPharmacies).catch((e) => setError(e.message))
   }, [])
+
+  /* Stock is per branch, so the catalog is refetched whenever the shopper
+     switches branches — including when they follow an out-of-stock referral. */
+  useEffect(() => {
+    const query = branchId ? `?branch_id=${branchId}` : ''
+    api.get(`/products${query}`).then(setProducts).catch((e) => setError(e.message))
+  }, [branchId])
+
+  /* A cart built at one branch can't be fulfilled at another. */
+  const changeBranch = (id) => {
+    if (id !== branchId) cart.clear()
+    setBranchId(id)
+  }
 
   const branch = useMemo(() => pharmacies.find((p) => p.id === branchId), [pharmacies, branchId])
 
@@ -329,29 +412,20 @@ export default function Pharmacy() {
         products={products}
         error={error}
         branchId={branchId}
-        setBranchId={setBranchId}
+        setBranchId={changeBranch}
         onCheckout={() => setView('checkout')}
       />
     )
   }
 
   const pages = [
-    {
-      id: 'shop',
-      label: 'Order Medicines',
-      scroll: true,
-      content: (
-        <ComingSoon
-          eyebrow="Gamot pharmacy"
-          title="Order Medicines"
-          note="Online medicine ordering from our Gamot partner pharmacies is coming soon. In the meantime, you can still find our pharmacy locations."
-        />
-      ),
-    },
+    /* No `scroll` — the catalog fits itself to the viewport (see useGridFit).
+       Checkout and the confirmation are short forms that still need to scroll
+       on a laptop, so they keep it. */
+    { id: 'shop', label: 'Order Medicines', scroll: view !== 'catalog', content: shopContent },
     {
       id: 'locations',
       label: 'Pharmacy Locations',
-      scroll: true,
       content: (
         <div className="hp-section finder-section">
           <span className="section-eyebrow">Where to find us</span>

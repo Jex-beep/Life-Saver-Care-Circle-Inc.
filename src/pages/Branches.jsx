@@ -43,7 +43,10 @@ const FACILITY_TYPES = [
 function FinderPage({ branches, error }) {
   const [typeId, setTypeId] = useState('yakap')
   const type = FACILITY_TYPES.find((t) => t.id === typeId) || FACILITY_TYPES[0]
-  const filtered = branches.filter(type.match)
+  /* branches can be null while the request is still resolving, or if a
+     fetch failed before error state caught up — never call .filter on it directly */
+  const safeBranches = Array.isArray(branches) ? branches : []
+  const filtered = safeBranches.filter(type.match)
 
   return (
     <div className="hp-section finder-section">
@@ -71,12 +74,12 @@ function FinderPage({ branches, error }) {
       {!error && filtered.length > 0 && (
         <BranchFinder key={typeId} branches={filtered} bookPath={STATIC_MODE ? null : '/book'} />
       )}
-      {!error && filtered.length === 0 && branches.length > 0 && (
+      {!error && filtered.length === 0 && safeBranches.length > 0 && (
         <p className="muted center finder-empty">
           No {type.label.toLowerCase()} listed yet — new locations are coming soon.
         </p>
       )}
-      {!error && branches.length === 0 && <p className="muted center">Loading…</p>}
+      {!error && safeBranches.length === 0 && <p className="muted center">Loading…</p>}
     </div>
   )
 }
@@ -87,7 +90,13 @@ export default function Branches() {
 
   useEffect(() => {
     if (STATIC_MODE) return
-    api.get('/branches').then(setBranches).catch((e) => setError(e.message))
+    api
+      .get('/branches')
+      .then((data) => setBranches(Array.isArray(data) ? data : []))
+      .catch((e) => {
+        setError(e.message)
+        setBranches([]) // keep state as an array even on failure
+      })
   }, [])
 
   const pages = [

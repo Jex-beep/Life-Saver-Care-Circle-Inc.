@@ -3,7 +3,15 @@ import fs from 'fs'
 import path from 'path'
 import 'dotenv/config'
 
-const { Pool } = pg
+const { Pool, types } = pg
+
+/* pg returns BIGINT and NUMERIC as strings by default. The app (written against
+   Supabase, which returned numbers) compares ids with === and does price math,
+   so parse them back into JS numbers. Our ids and prices fit safely in a double. */
+const INT8_OID = 20
+const NUMERIC_OID = 1700
+types.setTypeParser(INT8_OID, (v) => (v === null ? null : Number(v)))
+types.setTypeParser(NUMERIC_OID, (v) => (v === null ? null : Number(v)))
 
 const required = ['RDS_HOST', 'RDS_PORT', 'RDS_DATABASE', 'RDS_USER', 'RDS_PASSWORD']
 const missing = required.filter((key) => !process.env[key])

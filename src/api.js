@@ -1,4 +1,8 @@
-const BASE = '/api'
+/* In dev, Vite proxies /api to localhost:4000. In production the site is static
+   (Apache), so set VITE_API_URL at build time to wherever the Express API runs,
+   e.g. VITE_API_URL=https://api.lscarecircle.com.ph */
+const API_ORIGIN = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '')
+const BASE = `${API_ORIGIN}/api`
  
 async function request(path, { method = 'GET', body, token } = {}) {
   let res
